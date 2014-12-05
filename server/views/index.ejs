@@ -1,0 +1,38 @@
+<html>
+<head>
+  <title>Ennova MagicBox Server</title>
+  <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.10/angular-ui-router.js"></script>
+  <script src="/javascripts/angularApp.js"></script>
+  <script src="https://cdn.socket.io/socket.io-1.2.1.js"></script>
+  <style> .glyphicon-thumbs-up { cursor:pointer } </style>
+</head>
+
+<body ng-app="EnnovaServer" ng-controller="MainCtrl">
+  <div class="page-header text-center">
+    <h1>Welcome to Ennova
+      <img src="images/logo.jpg" width="10%" height="5%"/> Server
+    </h1>
+  </div>
+  <div class="container-fluid">    
+    <div class="row-fluid">
+      <div class="col-lg-3">       
+       <button ui-sref="user_list" class="btn btn-primary">
+        User List
+      </button><br>
+      <button style="margin-top:100px;" ui-sref="ticket_list" class="btn btn-primary">
+        Ticket List
+      </button>
+    </div>
+
+    <div class="col-lg-9" ui-view="body-view">
+
+    </div>
+
+  </div>
+</div>
+
+
+</body>
+</html>
