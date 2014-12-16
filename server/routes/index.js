@@ -22,7 +22,8 @@ router.get('/user_list', function(req, res, next) {
 });
 
 router.post('/user_list', function(req, res, next) {
-	console.log(req);
+	console.log(req.ip);
+	//console.log(req);
 	console.log(req.body[0]);
 	console.log(req.body[0].device_id);
 
