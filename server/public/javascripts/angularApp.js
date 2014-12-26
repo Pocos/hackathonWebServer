@@ -22,6 +22,7 @@ angular.module('EnnovaServer', ['ui.router']).config([
 					'<tr>'+
 					' <td>Device Id</td>'+
 					'<td>GCM Id</td>'+
+					'<td>WIFI Status</td>'+
 					'<td>Total Tickets #</td>'+
 					'<td>Ticket List</td>'+
 					'</tr>'+
@@ -29,6 +30,7 @@ angular.module('EnnovaServer', ['ui.router']).config([
 					'<tr ng-repeat="user in user_list|orderBy:\'-total_tickets\'">'+
 					'<td>{{user.device_id}}</td>'+
 					'<td>{{user.gcm_id}}</td>'+
+					'<td>{{user.status_wifi}}</td>'+
 					'<td>{{user.total_tickets}}</td>'+
 					'<td><a href="#/ticket_list/{{user.device_id}}">Ticket List</a></td>'+
 					'<td><a href="#/open_console/{{user.device_id}}">Open Console</a></td>'+

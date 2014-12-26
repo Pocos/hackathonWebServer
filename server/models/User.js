@@ -1,8 +1,10 @@
 var mongoose = require('mongoose');
 
 var UserSchema = new mongoose.Schema({
-	device_id: {type:String, unique:true},
+	device_id: {type:String},
 	gcm_id: String,
+	status_wifi:String,
+	ip_address:String,
 	total_tickets: {type: Number, default: 0},
 	tickets: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ticket' }]
 });
@@ -11,6 +13,7 @@ UserSchema.methods.upcount=function upcount(cb){
 	this.total_tickets++;
 	this.save(cb);
 };
+
 /*
 UserSchema.method('upcount', function(cb){
 	this.total_tickets++;

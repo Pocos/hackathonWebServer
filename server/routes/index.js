@@ -13,37 +13,6 @@ router.get('/', function(req, res) {
 	res.render('index', { title: 'Ennova' });
 });
 
-router.get('/user_list', function(req, res, next) {
-	User.find(function(err, users){
-		if(err){ return next(err); }
-		res.json(users);
-		//console.log(users);
-	});
-});
-
-router.post('/user_list', function(req, res, next) {
-	console.log(req.ip);
-	//console.log(req);
-	console.log(req.body[0]);
-	console.log(req.body[0].device_id);
-
-	//TODO: check if the request is well formed --> check if ==false 
-	if(req.body[0].device_id==null || req.body[0].device_id=='' || req.body[0].device_id=='undefined'){
-		return res.end("Request Malformed");
-	}
-
-		
-	//set total_tickets to default value
-	req.body[0].total_tickets=0;
-	var user = new User(req.body[0]);
-	
-	user.save(function(err, user){
-		if(err){ return next(err); }
-
-		res.json(user);
-	});
-});
-
 router.param('user', function(req, res, next, id) {
 	var query;
 	if(id=='all'){
@@ -58,6 +27,38 @@ router.param('user', function(req, res, next, id) {
 
 		req.user = user;
 		return next();
+	});
+});
+
+router.get('/user_list', function(req, res, next) {
+	User.find(function(err, users){
+		if(err){ return next(err); }
+		res.json(users);
+		//console.log(users);
+	});
+});
+
+//Update the infos about the users, or create a new one.
+router.post('/user_list', function(req, res, next) {
+	//console.log(req.ip);
+	//console.log(req);
+	console.log(req.ip);
+	console.log(req.body.device_id);
+
+	//TODO: check if the request is well formed --> check if ==false 
+	if(req.body.device_id==null || req.body.device_id=='' || req.body.device_id=='undefined'){
+		return res.end("Request Malformed");
+	}
+
+
+	//Attach the ip address to the body string
+	req.body.ip_address=req.ip;
+
+	//Set or update the user. We pass the body string of the request
+	var query={device_id:req.body.device_id};
+	User.findOneAndUpdate(query,req.body,{upsert:true}, function(err, user){
+		if(err){ return next(err); }
+		res.json(user);
 	});
 });
 
@@ -96,7 +97,7 @@ router.delete('/user_list/:user', function(req, res) {
 			
 		},
 		function(err){
-			//now all the asynchronous request to the DB have returned
+			//now all the asynchronous requests to the DB have returned
 			//console.log("finito");
 			res.end("Finish");
 			//res.json("finito");
@@ -117,12 +118,11 @@ router.post('/ticket_list/:user', function(req, res, next) {
 	});
 
 //increment the ticket count for the user
-	req.user[0].upcount(function(err,user){
-		if(err){ return next(err); }
-		res.json(ticket);
-	});
+req.user[0].upcount(function(err,user){
+	if(err){ return next(err); }
+});
 
-	
+res.json({action: "Richiesta ricevuta"});
 });
 
 router.get('/ticket_list/:user', function(req, res, next) {
