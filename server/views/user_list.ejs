@@ -1,0 +1,21 @@
+<h2>User List</h2>
+<table border=4>
+	<thead>
+		<tr>
+			<td>Device Id</td>
+			<!--<td>GCM Id</td>-->
+			<td>WIFI Status</td>
+			<td>Total Tickets #</td>
+			<td>Ip Address</td>
+		</tr>
+	</thead>
+	<tr ng-repeat="user in user_list">
+		<td>{{user.device_id}}</td>
+		<!--<td>{{user.gcm_id}}</td>-->
+		<td>{{user.status_wifi}}</td>
+		<td>{{user.total_tickets}}</td>
+		<td>{{user.ip_address}}</td>
+		<td><a href="#/ticket_list/{{user.device_id}}">Ticket List</a></td>
+		<td><a href="#/open_console/{{user.device_id}}">Open Console</a></td>
+	</td></tr></table>
+	Automatic Refresh: <input type="checkbox" ng-model="refresh" ng-change="change()"> <br/>

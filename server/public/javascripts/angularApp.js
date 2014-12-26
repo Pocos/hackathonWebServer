@@ -8,7 +8,7 @@ angular.module('EnnovaServer', ['ui.router']).config([
 			url: "/",
 			views: {
 				"body-view": {
-					template: "clicca"
+					templateUrl: "partial/home"
 				}
 			}
 		})
@@ -16,26 +16,7 @@ angular.module('EnnovaServer', ['ui.router']).config([
 			url: "/user_list",
 			views: {
 				"body-view": {
-					template: '<h2>User List</h2>'+
-					'<table border=4>'+
-					'<thead>'+
-					'<tr>'+
-					' <td>Device Id</td>'+
-					'<td>GCM Id</td>'+
-					'<td>WIFI Status</td>'+
-					'<td>Total Tickets #</td>'+
-					'<td>Ticket List</td>'+
-					'</tr>'+
-					'</thead>'+
-					'<tr ng-repeat="user in user_list|orderBy:\'-total_tickets\'">'+
-					'<td>{{user.device_id}}</td>'+
-					'<td>{{user.gcm_id}}</td>'+
-					'<td>{{user.status_wifi}}</td>'+
-					'<td>{{user.total_tickets}}</td>'+
-					'<td><a href="#/ticket_list/{{user.device_id}}">Ticket List</a></td>'+
-					'<td><a href="#/open_console/{{user.device_id}}">Open Console</a></td>'+
-					'</td></tr></table>'+
-					'Automatic Refresh: <input type="checkbox" ng-model="refresh" ng-change="change()"> <br/>',
+					templateUrl: "partial/user_list",
 					controller: 'UserListController',
 				}
 				

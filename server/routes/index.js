@@ -1,18 +1,52 @@
+/*******************FILE DESCRIPTION***********************
+* 
+* This js script handles all the routes for the server. Any GET, POST, etc made by the device or by the angular page
+* pass through here. Below there is the list of the contents. Read each section header for any explanation:
+* 1 - Render Page Views section
+* 2 - Parameters section
+* 3 - User List operation section
+* 4 - Ticket List operation section
+**********************************************************/
+
 var express = require('express');
 var mongoose = require('mongoose');
 var User = mongoose.model('User');
 var Ticket = mongoose.model('Ticket');
 var async = require('async');
-
 var router = express.Router();
 
 
-
-/* GET home page. */
+/*******************SECTION: RENDER PAGE VIEWS***********************
+* 
+* The angular pages requires some html/ejs code to fill textboxes, field, table, and so on. To obtain the code they
+* perform some GET requests. Here we catch these request and properly render the requested code.
+* We recommend to read public/javascript/angularApp to know when how and where this requested are made
+*
+*
+**********************************************************/
+//Home page
 router.get('/', function(req, res) {
 	res.render('index', { title: 'Ennova' });
 });
 
+//Initial inner view of the body home page
+router.get('/partial/home', function(req, res, next) {
+	res.render('home', { title: 'Ennova' });
+});
+
+//View for user_list state
+router.get('/partial/user_list', function(req, res, next) {
+	console.log("!!!!!!!QUI!!!!");
+	res.render('user_list');
+});
+/*******************SECTION: PARAMETERS***********************
+* 
+* PARAMETERS USED TO ATTACH AN HEADER TO A REQUEST.
+* Ex. Post /ticket_list/:user. Before to perform the post ticket_list operation on ticket list we catch the user param,
+* do some operation on this param and then attach it on req.user for the post ticket_list
+*
+*
+**********************************************************/
 router.param('user', function(req, res, next, id) {
 	var query;
 	if(id=='all'){
@@ -27,38 +61,6 @@ router.param('user', function(req, res, next, id) {
 
 		req.user = user;
 		return next();
-	});
-});
-
-router.get('/user_list', function(req, res, next) {
-	User.find(function(err, users){
-		if(err){ return next(err); }
-		res.json(users);
-		//console.log(users);
-	});
-});
-
-//Update the infos about the users, or create a new one.
-router.post('/user_list', function(req, res, next) {
-	//console.log(req.ip);
-	//console.log(req);
-	console.log(req.ip);
-	console.log(req.body.device_id);
-
-	//TODO: check if the request is well formed --> check if ==false 
-	if(req.body.device_id==null || req.body.device_id=='' || req.body.device_id=='undefined'){
-		return res.end("Request Malformed");
-	}
-
-
-	//Attach the ip address to the body string
-	req.body.ip_address=req.ip;
-
-	//Set or update the user. We pass the body string of the request
-	var query={device_id:req.body.device_id};
-	User.findOneAndUpdate(query,req.body,{upsert:true}, function(err, user){
-		if(err){ return next(err); }
-		res.json(user);
 	});
 });
 
@@ -81,6 +83,47 @@ router.param('ticket', function(req, res, next, id) {
 		return next();
 	});
 });
+
+/*******************SECTION: USER LIST OPERATIONS***********************
+* 
+*
+*
+*
+**********************************************************/
+router.get('/user_list', function(req, res, next) {
+	User.find(function(err, users){
+		if(err){ return next(err); }
+		res.json(users);
+		//console.log(users);
+	});
+});
+
+
+//Update the infos about the users, or create a new one.
+router.post('/user_list', function(req, res, next) {
+	//console.log(req.ip);
+	//console.log(req);
+	console.log(req.ip);
+	console.log(req.body.device_id);
+
+	//if(req.body.device_id==null || req.body.device_id=='' || req.body.device_id=='undefined'){
+		if(!req.body.device_id){
+			return res.end("Request Malformed");
+		}
+
+
+	//Attach the ip address to the body string
+	req.body.ip_address=req.ip;
+
+	//Set or update the user. We pass the body string of the request
+	var query={device_id:req.body.device_id};
+	User.findOneAndUpdate(query,req.body,{upsert:true}, function(err, user){
+		if(err){ return next(err); }
+		res.json(user);
+	});
+});
+
+
 
 router.delete('/user_list/:user', function(req, res) {
 	res.setHeader('Content-Type', 'application/json');
@@ -105,7 +148,12 @@ router.delete('/user_list/:user', function(req, res) {
 		);
 });
 
-
+/*******************SECTION: TICKET LIST OPERATIONS***********************
+* 
+* 
+*
+*
+**********************************************************/
 router.post('/ticket_list/:user', function(req, res, next) {
 //add the ticket
 	//console.log(req.user.device_id);
@@ -170,5 +218,6 @@ router.delete('/ticket_list/:user/:ticket', function(req, res) {
 		}
 		);
 });
+
 
 module.exports = router;
