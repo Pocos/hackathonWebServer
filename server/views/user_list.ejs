@@ -7,6 +7,7 @@
 			<td>WIFI Status</td>
 			<td>Total Tickets #</td>
 			<td>Ip Address</td>
+			<td>Last access</td>
 		</tr>
 	</thead>
 	<tr ng-repeat="user in user_list">
@@ -15,6 +16,7 @@
 		<td>{{user.status_wifi}}</td>
 		<td>{{user.total_tickets}}</td>
 		<td>{{user.ip_address}}</td>
+		<td>{{user.last_login}}</td>
 		<td><a href="#/ticket_list/{{user.device_id}}">Ticket List</a></td>
 		<td><a href="#/open_console/{{user.device_id}}">Open Console</a></td>
 	</td></tr></table>

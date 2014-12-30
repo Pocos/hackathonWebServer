@@ -99,21 +99,30 @@ router.get('/user_list', function(req, res, next) {
 });
 
 
-//Update the infos about the users, or create a new one.
-router.post('/user_list', function(req, res, next) {
-	//console.log(req.ip);
-	//console.log(req);
+
+
+//Update the infos about the users, or create a new one. The param device_id is the id that is needed
+//to be inserted/updated
+router.post('/user_list/:device_id', function(req, res, next) {
 	console.log(req.ip);
 	console.log(req.body.device_id);
+	console.log(req.params.device_id);
 
 	//if(req.body.device_id==null || req.body.device_id=='' || req.body.device_id=='undefined'){
-		if(!req.body.device_id){
-			return res.end("Request Malformed");
-		}
+	//	if(!req.body.device_id){
+	//		return res.end("Request Malformed");
+	//	}
 
+
+	//TODO: Is attach the info on the body request the best practice?
+	//Attach the ip address to the body string
+	req.body.device_id=req.params.device_id;
 
 	//Attach the ip address to the body string
 	req.body.ip_address=req.ip;
+	
+	//Attach last login information
+	req.body.last_login=new Date().toUTCString();
 
 	//Set or update the user. We pass the body string of the request
 	var query={device_id:req.body.device_id};
@@ -155,11 +164,12 @@ router.delete('/user_list/:user', function(req, res) {
 *
 **********************************************************/
 router.post('/ticket_list/:user', function(req, res, next) {
-//add the ticket
-	//console.log(req.user.device_id);
-	//req.body.device_id=req.user.device_id;
-	console.log(req.body[0]);
-	var ticket = new Ticket(req.body[0]);
+//add the ticket. You need to user req.user[0] because the user parameter is the result of a query
+//so mongoose returns the results into an array
+	
+	var ticket = new Ticket();
+ 	ticket.device_id=req.user[0].device_id;
+ 	ticket.timestamp= new Date().toUTCString();
 
 	ticket.save(function(err, ticket){
 		if(err){ return next(err); }		

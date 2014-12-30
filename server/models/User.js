@@ -5,6 +5,7 @@ var UserSchema = new mongoose.Schema({
 	gcm_id: String,
 	status_wifi:String,
 	ip_address:String,
+	last_login:String,
 	total_tickets: {type: Number, default: 0},
 	tickets: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ticket' }]
 });
