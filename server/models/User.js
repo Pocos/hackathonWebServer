@@ -15,6 +15,11 @@ UserSchema.methods.upcount=function upcount(cb){
 	this.save(cb);
 };
 
+UserSchema.methods.downcount=function upcount(cb){
+	this.total_tickets--;
+	this.save(cb);
+};
+
 /*
 UserSchema.method('upcount', function(cb){
 	this.total_tickets++;

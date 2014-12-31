@@ -10,14 +10,16 @@
 			<td>Last access</td>
 		</tr>
 	</thead>
-	<tr ng-repeat="user in user_list">
+	<!-- track by is used to avoid ng dupes error -->
+	<tr ng-repeat="user in user_list track by $index">
 		<td>{{user.device_id}}</td>
 		<!--<td>{{user.gcm_id}}</td>-->
 		<td>{{user.status_wifi}}</td>
 		<td>{{user.total_tickets}}</td>
 		<td>{{user.ip_address}}</td>
 		<td>{{user.last_login}}</td>
-		<td><a href="#/ticket_list/{{user.device_id}}">Ticket List</a></td>
-		<td><a href="#/open_console/{{user.device_id}}">Open Console</a></td>
+		<td><a ng-href="#/ticket_list/{{user.device_id}}">Ticket List</a></td>
+		<td><a ng-href="#/open_console/{{user.device_id}}">Open Console</a></td>
+		<td><a ng-click="delete(user.device_id)">Delete User</a></td>
 	</td></tr></table>
 	Automatic Refresh: <input type="checkbox" ng-model="refresh" ng-change="change()"> <br/>

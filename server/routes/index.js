@@ -45,7 +45,7 @@ router.get('/partial/user_list', function(req, res, next) {
 * Ex. Post /ticket_list/:user. Before to perform the post ticket_list operation on ticket list we catch the user param,
 * do some operation on this param and then attach it on req.user for the post ticket_list
 *
-*
+* id : contains the value of the parameter
 **********************************************************/
 router.param('user', function(req, res, next, id) {
 	var query;
@@ -64,25 +64,39 @@ router.param('user', function(req, res, next, id) {
 	});
 });
 
+//Parameter used for the delete operation of the tickets. Note that the route that contains 
+//a ticket param also contains the user param, which is the result of a query on the DB, performed
+// in router.param('user'... and which can be accessed as an header of the request
+//!!! Ex. the route router.delete('/ticket_list/:user/:ticket')
+//!!! router.delete('ticket_list/DEVICE_2/all') 
+//1 - Firstly it is performed a query on the DB to find if the user DEVICE_2 exist, then the result is
+//attached to the header of the request (req.user)
+//2 - Then the result of the query is used to filter the tickets basing on the device_id, obtaining 
+//a list
+//3 - Finally if the ticket param is equal to 'all' all the tickets for that user will be returned,
+//otherwise if only a single ticket id is specified then only that ticket will be returned
 router.param('ticket', function(req, res, next, id) {
 	var query;
-	console.log(id);
+
 	if(id=='all'){
-		//console.log("all");
-		query=Ticket.find();	
+		//get all the tickets for the user specified, which is in the user header
+		query=Ticket.find({device_id:req.user[0].device_id});	
 	}
 	else
-		query = Ticket.find({_id:id});
+		//This is the case when we want to delete only one ticket for the specified user.
+		//Since the ticket id is unique in the ticket list an AND condition for the query
+		//Ticket.find({_id:id $AND device_id:req.user[0].device_id}) could be simplified as
+		query = Ticket.find({_id:id}); 
 
-	query.exec(function (err, ticket){
-		console.log(ticket);
-		if (err) { return next(err); }
-		if (!ticket.length) { return next(new Error("can't find ticket")); }
+		query.exec(function (err, ticket){
+	//	console.log(ticket);
+	if (err) { return next(err); }
+	if (!ticket.length) { return next(new Error("can't find ticket")); }
 
-		req.ticket = ticket;
-		return next();
-	});
+	req.ticket = ticket;
+	return next();
 });
+	});
 
 /*******************SECTION: USER LIST OPERATIONS***********************
 * 
@@ -132,7 +146,9 @@ router.post('/user_list/:device_id', function(req, res, next) {
 	});
 });
 
-
+//This route allow to delete one or more user
+//if the param user is equal to a single user id, just that user will be deleted
+//if the param user is equal to the keyword "all", all the users will be deleted
 
 router.delete('/user_list/:user', function(req, res) {
 	res.setHeader('Content-Type', 'application/json');
@@ -166,14 +182,14 @@ router.delete('/user_list/:user', function(req, res) {
 router.post('/ticket_list/:user', function(req, res, next) {
 //add the ticket. You need to user req.user[0] because the user parameter is the result of a query
 //so mongoose returns the results into an array
-	
-	var ticket = new Ticket();
- 	ticket.device_id=req.user[0].device_id;
- 	ticket.timestamp= new Date().toUTCString();
 
-	ticket.save(function(err, ticket){
-		if(err){ return next(err); }		
-	});
+var ticket = new Ticket();
+ticket.device_id=req.user[0].device_id;
+ticket.timestamp= new Date().toUTCString();
+
+ticket.save(function(err, ticket){
+	if(err){ return next(err); }		
+});
 
 //increment the ticket count for the user
 req.user[0].upcount(function(err,user){
@@ -183,6 +199,7 @@ req.user[0].upcount(function(err,user){
 res.json({action: "Richiesta ricevuta"});
 });
 
+//Get all the tickets for the user specified
 router.get('/ticket_list/:user', function(req, res, next) {
 	var output=[];
 	async.each(req.user,		
@@ -206,16 +223,25 @@ router.get('/ticket_list/:user', function(req, res, next) {
 
 });
 
+//This route allow to delete one or more ticket for the user specified
+//if the param ticket is equal to a single ticket id, just that ticket will be deleted
+//if the param ticket is equal to the keyword "all", all the tickets for the user param will be deleted
 router.delete('/ticket_list/:user/:ticket', function(req, res) {
 	res.setHeader('Content-Type', 'application/json');
+	console.log(req.ticket);
 	async.each(req.ticket,		
 		function(ticket,callback){
 			console.log(ticket);
 			Ticket.findById(ticket._id).remove(function(err){				
 				if(err)
 					res.write("Error on deleting element with 'device_id': '"+ticket._id+"'\n" );
-				else
+				else{
 					res.write("Successfully deleted element with 'device_id': '"+ticket._id+"'\n");
+					req.user[0].downcount(function(err,user){
+						if(err){ return next(err); }
+					});
+				}
+
 				callback();
 			});
 			
@@ -227,6 +253,7 @@ router.delete('/ticket_list/:user/:ticket', function(req, res) {
 			//res.json("finito");
 		}
 		);
+
 });
 
 

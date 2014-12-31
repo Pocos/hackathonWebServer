@@ -31,13 +31,14 @@ angular.module('EnnovaServer', ['ui.router']).config([
 					'<table border=4>'+
 					'<thead>'+
 					'<tr>'+
-					'<td>Device Id</td>'+
+					'<td>Ticket Id</td>'+
 					'<td>Timestamp</td>'+
 					'</thead>'+
 					'<tr ng-repeat="ticket in ticket_list|orderBy:\'timestamp\'">'+
-					'<td>{{ticket.device_id}}</td>'+
+					'<td>{{ticket._id}}</td>'+
 					'<td>{{ticket.timestamp}}</td>'+
-					'<td><a href="#/open_console/{{user.device_id}}">Open Console</a></td>'+
+					'<td><a href="#/open_console/{{ticket.device_id}}">Open Console</a></td>'+
+					'<td><a ng-click="delete(device_id,ticket._id)">Delete Ticket</a></td>'+
 					'</td></tr></table>',
 					controller: 'UserTicketController'
 				}
@@ -51,12 +52,12 @@ angular.module('EnnovaServer', ['ui.router']).config([
 					template: '<h2>Console for user {{device_id}}</h2>'+
 					'<div style="background-color: #FFFFFF;">'+
 					'<li ng-repeat=" command in commands track by $index">'+
-     				'{{command}}</li>'+
+					'{{command}}</li>'+
 					'<form role="form" ng-submit="send_command()">'+
-					  '<div class="form-group">'+
-					    '<input type="text" class="form-control" ng-model="cmd_text" placeholder="Insert command">'+
-					  '</div>'+
-					  '</form>'+
+					'<div class="form-group">'+
+					'<input type="text" class="form-control" ng-model="cmd_text" placeholder="Insert command">'+
+					'</div>'+
+					'</form>'+
 					'</div>',
 					controller: 'UserConsole'
 				}
@@ -74,7 +75,7 @@ angular.module('EnnovaServer', ['ui.router']).config([
 					'<td>Device Id</td>'+
 					'<td>Timestamp</td>'+
 					'</thead>'+
-					'<tr ng-repeat="ticket in ticket_list|orderBy:\'timestamp\'">'+
+					'<tr ng-repeat="ticket in ticket_list|orderBy:\'timestamp\' track by $index">'+
 					'<td>{{ticket.device_id}}</td>'+
 					'<td>{{ticket.timestamp}}</td>'+
 					'<td><a href="#/open_console/{{ticket.device_id}}">Open Console</a></td>'+
@@ -90,63 +91,83 @@ angular.module('EnnovaServer', ['ui.router']).config([
 	var o = {
 		user_list: [], ticket_list: [], user_ticket_list: []
 	};
-	o.getUserList = function() {
-		return $http.get('/user_list').success(function(data){
-			angular.copy(data, o.user_list);
-		});
-	};
 
-	o.getAllTicketList= function() {
-		return $http.get('/ticket_list/all').success(function(data){
-			angular.copy(data, o.ticket_list);
-		});
-	};
+//Get all the users
+o.getUserList = function() {
+	return $http.get('/user_list').success(function(data){
+		angular.copy(data, o.user_list);
+	});
+};
+//Get all the tickets of all the users
+o.getAllTicketList= function() {
+	return $http.get('/ticket_list/all').success(function(data){
+		angular.copy(data, o.ticket_list);
+	});
+};
 
-	o.getUserTicketList= function(id) {
-		return $http.get('/ticket_list/'+id).success(function(data){
-			angular.copy(data, o.user_ticket_list);
-		});
-	};
+//Get all the tickets of the specified user
+o.getUserTicketList= function(device_id) {
+	return $http.get('/ticket_list/'+device_id).success(function(data){
+		angular.copy(data, o.user_ticket_list);
+	});
+};
 
-	return o;
+//Delete all the tickets for the specified user
+o.deleteUserTicketList=function(device_id){
+	return $http.delete('/ticket_list/'+device_id+'/all').success(function(data){
+	});
+};
+
+//Delete the specified ticket for the specified user
+o.deleteUserSingleTicket=function(device_id,ticket_id){
+	return $http.delete('/ticket_list/'+device_id+'/'+ticket_id).success(function(data){
+	});
+};
+
+//Delete the user specified	
+o.deleteUser=function(device_id){
+	return $http.delete('/user_list/'+device_id).success(function(data){
+	});
+};
+return o;
 }])
 
 //Factory that handle SOCKET-IO events and forward them to angular. That's needed in order to use $scope
 .factory('socket', ['$rootScope', function ($rootScope) {
-  var socket = io.connect();
+	var socket = io.connect();
 	
-  return {
-    on: function (eventName, callback) {
-      function wrapper() {
-        var args = arguments;
-        $rootScope.$apply(function () {
-          callback.apply(socket, args);
-        });
-      }
+	return {
+		on: function (eventName, callback) {
+			function wrapper() {
+				var args = arguments;
+				$rootScope.$apply(function () {
+					callback.apply(socket, args);
+				});
+			}
 
-      socket.on(eventName, wrapper);
+			socket.on(eventName, wrapper);
 
-      return function () {
-        socket.removeListener(eventName, wrapper);
-      };
-    },
+			return function () {
+				socket.removeListener(eventName, wrapper);
+			};
+		},
 
-    emit: function (eventName, data, callback) {
-      socket.emit(eventName, data, function () {
-        var args = arguments;
-        $rootScope.$apply(function () {
-          if(callback) {
-            callback.apply(socket, args);
-          }
-        });
-      });
-    },
-    isConnected: function(){
-    	if(socket.connected==false)
-    		return false;
-    	else return true;
-    }
-  };
+		emit: function (eventName, data, callback) {
+			socket.emit(eventName, data, function () {
+				var args = arguments;
+				$rootScope.$apply(function () {
+					if(callback) {
+						callback.apply(socket, args);
+					}
+				});
+			});
+		},
+		isConnected: function(){
+			if(socket.connected==false)
+				return false;
+			else return true;
+		}
+	};
 }])
 
 .controller('MainCtrl', [
@@ -172,6 +193,13 @@ angular.module('EnnovaServer', ['ui.router']).config([
 		service.getUserList();
 		$scope.user_list = service.user_list;
 
+//Delete all the tickets for the specified user and then delete the user
+$scope.delete=function(device_id){
+	service.deleteUserTicketList(device_id);
+	service.deleteUser(device_id);
+			//Refresh the view
+			service.getUserList();
+		}
 		
 //Refresh user_list without to reload whole page
 $scope.change=function(){
@@ -213,6 +241,12 @@ $scope.$on('$destroy', function(e) {
 		service.getUserTicketList($stateParams.device_id);
 		$scope.ticket_list = service.user_ticket_list;
 
+//Delete all the tickets for the specified user and then delete the user
+$scope.delete=function(device_id,ticket_id){	
+	service.deleteUserSingleTicket(device_id,ticket_id);
+	//Refresh the view
+	service.getUserTicketList(device_id);
+}
 
 	}])
 
