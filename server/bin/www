@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 var debug = require('debug')('flapper-news');
 var app = require('../app');
-var socketio  = require('socket.io');
+//var socketio  = require('socket.io');
 
 app.set('port', process.env.PORT || 8080);
 

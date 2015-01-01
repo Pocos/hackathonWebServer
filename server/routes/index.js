@@ -6,15 +6,17 @@
 * 2 - Parameters section
 * 3 - User List operation section
 * 4 - Ticket List operation section
+* 5 - GCM Commands operation section
 **********************************************************/
 
 var express = require('express');
 var mongoose = require('mongoose');
 var User = mongoose.model('User');
 var Ticket = mongoose.model('Ticket');
+var Command = mongoose.model('Command');
 var async = require('async');
 var router = express.Router();
-
+var GCM = require('gcm').GCM;
 
 /*******************SECTION: RENDER PAGE VIEWS***********************
 * 
@@ -36,9 +38,24 @@ router.get('/partial/home', function(req, res, next) {
 
 //View for user_list state
 router.get('/partial/user_list', function(req, res, next) {
-	console.log("!!!!!!!QUI!!!!");
 	res.render('user_list');
 });
+
+//View for tickets for a specified user
+router.get('/partial/user-ticket_list', function(req, res, next) {
+	res.render('user-ticket_list');
+});
+
+//View for all the tickets
+router.get('/partial/ticket_list',function(req,res,next){
+	res.render('ticket_list');
+})
+
+//View for the gcm console
+router.get('/partial/user_gcm',function(req,res,next){
+	res.render('user_gcm');
+})
+
 /*******************SECTION: PARAMETERS***********************
 * 
 * PARAMETERS USED TO ATTACH AN HEADER TO A REQUEST.
@@ -199,7 +216,9 @@ req.user[0].upcount(function(err,user){
 res.json({action: "Richiesta ricevuta"});
 });
 
-//Get all the tickets for the user specified
+//Get all the tickets for the user specified, or for all the user if keyword "all" is used for the
+//the user pparam. In this case we need an async each structure to wait until all the tickets for all
+//the users are found
 router.get('/ticket_list/:user', function(req, res, next) {
 	var output=[];
 	async.each(req.user,		
@@ -247,7 +266,7 @@ router.delete('/ticket_list/:user/:ticket', function(req, res) {
 			
 		},
 		function(err){
-			//now all the asynchronous request to the DB have returned
+			//now all the asynchron-ous request to the DB have returned
 			//console.log("finito");
 			res.end("Finish");
 			//res.json("finito");
@@ -255,6 +274,105 @@ router.delete('/ticket_list/:user/:ticket', function(req, res) {
 		);
 
 });
+
+/*******************SECTION: GCM COMMANDS OPERATIONS***********************
+* 
+* 
+*
+*
+**********************************************************/
+
+//API KEY. You can obtain it from console.developer.google.com
+var gcm = new GCM('AIzaSyAZmb3Q4nAK9zYgXJRs7wdQbhN0eaZkV1M');
+
+//Post command called by the angular client
+router.post('/send_command', function(req, res, next) {
+	console.log(req.body.device_id);
+	console.log(req.body.cmd);
+
+	User.find({device_id: req.body.device_id},function(err, users){
+		if(err){ return next(err); }
+		//console.log(users);
+
+		var message = {
+    		registration_id: users[0].gcm_id, // required
+    		collapse_key: 'Collapse key', 
+    		'data.message_action': req.body.cmd,
+    		'data.key2': 'value2'
+		};
+
+		gcm.send(message, function(err, messageId){
+			if (err) {
+				console.log("Something has gone wrong on GCM send message!");
+			}else {
+			console.log("Sent with message ID: ", messageId);			
+			}
+		});
+		//console.log(users);
+	});
+
+	//il client angular è in attesa di una risposta
+	//res.json({resp:"Command sent"});
+	res.json("OK");
+});
+
+//Post command called by the device as answer of a requested action
+router.post('/command_list/:user/:action', function(req, res, next) {
+	console.log(req.user[0].device_id);
+	console.log(req.params.action);
+	/*for(var i=0; i<req.body.length;i++){
+		console.log(req.body[i]);
+	}*/
+
+	var command = new Command();
+	command.device_id=req.user[0].device_id;
+	command.action= req.params.action;
+	command.payload=req.body;
+
+	command.save(function(err, command){
+		if(err){ return next(err); }		
+	});
+
+	//console.log(req.body.essid);
+	//console.log(req.body.mac);
+	res.json("Post command successful received");
+});
+
+//Get command called by the angular client to render the answer of the device
+router.get('/command_list/:user',function(req,res,next){
+	Command.find({device_id: req.user[0].device_id},function(err, commands){
+		if(err){ return next(err); }
+		res.json(commands);
+		//console.log(users);
+	});
+});
+
+//This route allow to delete one or more command
+//if the param user is equal to a single user id, only the commands for that user are deleted
+//if the param user is equal to the keyword "all", all the commands are deleted
+router.delete('/command_list/:user', function(req, res) {
+	res.setHeader('Content-Type', 'application/json');
+	async.each(req.user,		
+		function(user,callback){
+			console.log(user);
+			Command.find({device_id : user.device_id}).remove(function(err){				
+				if(err)
+					res.write("Error on deleting commands for 'device_id': '"+user.device_id+"'\n" );
+				else
+					res.write("Successfully deleted commands for 'device_id': '"+user.device_id+"'\n");
+				callback();
+			});
+			
+		},
+		function(err){
+			//now all the asynchronous requests to the DB have returned
+			//console.log("finito");
+			res.end("Finish");
+			//res.json("finito");
+		}
+		);
+});
+
 
 
 module.exports = router;

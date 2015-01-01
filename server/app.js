@@ -9,6 +9,7 @@ var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/ennova');
 require('./models/User');
 require('./models/Ticket');
+require('./models/Command');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');

@@ -27,23 +27,22 @@ angular.module('EnnovaServer', ['ui.router']).config([
 			views: {
 				"body-view":
 				{
-					template: '<h2>Ticket List for user {{device_id}}</h2>'+
-					'<table border=4>'+
-					'<thead>'+
-					'<tr>'+
-					'<td>Ticket Id</td>'+
-					'<td>Timestamp</td>'+
-					'</thead>'+
-					'<tr ng-repeat="ticket in ticket_list|orderBy:\'timestamp\'">'+
-					'<td>{{ticket._id}}</td>'+
-					'<td>{{ticket.timestamp}}</td>'+
-					'<td><a href="#/open_console/{{ticket.device_id}}">Open Console</a></td>'+
-					'<td><a ng-click="delete(device_id,ticket._id)">Delete Ticket</a></td>'+
-					'</td></tr></table>',
+					templateUrl: "partial/user-ticket_list",
 					controller: 'UserTicketController'
 				}
 			}
 		})
+		.state('user_gcm', {
+			url: "/user_gcm/:device_id",
+			views: {
+				"body-view": {
+					templateUrl: "partial/user_gcm",
+					controller: 'UserGcmController',
+				}
+				
+			}
+		})
+		//not used anymore. Once upon a time it was used for the socket io part
 		.state('user-console', {
 			url: "/open_console/:device_id",
 			views: {
@@ -68,25 +67,14 @@ angular.module('EnnovaServer', ['ui.router']).config([
 			views: {
 				"body-view":
 				{
-					template: '<h2>Ticket List</h2>'+
-					'<table border=4>'+
-					'<thead>'+
-					'<tr>'+
-					'<td>Device Id</td>'+
-					'<td>Timestamp</td>'+
-					'</thead>'+
-					'<tr ng-repeat="ticket in ticket_list|orderBy:\'timestamp\' track by $index">'+
-					'<td>{{ticket.device_id}}</td>'+
-					'<td>{{ticket.timestamp}}</td>'+
-					'<td><a href="#/open_console/{{ticket.device_id}}">Open Console</a></td>'+
-					'</td></tr></table>'+
-					'Automatic Refresh: <input type="checkbox" ng-model="refresh" ng-change="change()"> <br/>',
+					templateUrl: "partial/ticket_list",
 					controller: 'TicketListController',
 				}
 			}
 		});
 	}])
 
+//This factory manages both the users and the tickets
 .factory('service', ['$http', function($http){
 	var o = {
 		user_list: [], ticket_list: [], user_ticket_list: []
@@ -130,6 +118,21 @@ o.deleteUser=function(device_id){
 	});
 };
 return o;
+}])
+
+//This factory handle the HTTP messages between the angular app to the server
+.factory('command_service', ['$http', function($http){
+	var o = {
+		results:[]
+	};
+
+	o.sendCommand=function(cmd){
+		return $http.post('/send_command/',cmd).success(function(data){	
+			angular.copy(data, o.results);
+			console.log(o.results);			
+	});
+	}
+	return o;
 }])
 
 //Factory that handle SOCKET-IO events and forward them to angular. That's needed in order to use $scope
@@ -236,7 +239,7 @@ $scope.$on('$destroy', function(e) {
 	'$state',
 	function($scope,service,$stateParams,$state){
 		//open ticket list for desidered user
-		console.log($stateParams.device_id);
+		//console.log($stateParams.device_id);
 		$scope.device_id=$stateParams.device_id;
 		service.getUserTicketList($stateParams.device_id);
 		$scope.ticket_list = service.user_ticket_list;
@@ -249,6 +252,30 @@ $scope.delete=function(device_id,ticket_id){
 }
 
 	}])
+
+
+.controller('UserGcmController', [
+	'$scope',
+	'command_service',
+	'$stateParams',
+	'$state',
+	function($scope,command_service,$stateParams,$state){
+		$scope.commands=[];
+		$scope.device_id=$stateParams.device_id;
+		$scope.results=command_service.results;
+
+		$scope.commands.push("Select one");
+
+		$scope.scanAP=function(){
+			$scope.commands=[];
+			$scope.commands.push("Selected AP Scan");
+
+			var data={device_id: $scope.device_id, cmd: "it.tonicminds.ennova.intent.action.SCAN_AP"};
+			command_service.sendCommand(data);
+			$scope.commands.push($scope.results);
+		}
+	}])
+
 
 .controller('UserConsole', [
 	'$scope',
