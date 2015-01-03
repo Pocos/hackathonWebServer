@@ -288,7 +288,10 @@ var gcm = new GCM('AIzaSyAZmb3Q4nAK9zYgXJRs7wdQbhN0eaZkV1M');
 //Post command called by the angular client
 router.post('/send_command', function(req, res, next) {
 	console.log(req.body.device_id);
-	console.log(req.body.cmd);
+	console.log(req.body.action);
+
+	//JSON TO SEND
+	var json_data=[];
 
 	User.find({device_id: req.body.device_id},function(err, users){
 		if(err){ return next(err); }
@@ -297,7 +300,7 @@ router.post('/send_command', function(req, res, next) {
 		var message = {
     		registration_id: users[0].gcm_id, // required
     		collapse_key: 'Collapse key', 
-    		'data.message_action': req.body.cmd,
+    		'data.message_action': req.body.action,
     		'data.key2': 'value2'
 		};
 
@@ -326,8 +329,10 @@ router.post('/command_list/:user/:action', function(req, res, next) {
 
 	var command = new Command();
 	command.device_id=req.user[0].device_id;
+	command.timestamp=new Date().toUTCString();
 	command.action= req.params.action;
 	command.payload=req.body;
+
 
 	command.save(function(err, command){
 		if(err){ return next(err); }		
@@ -335,16 +340,24 @@ router.post('/command_list/:user/:action', function(req, res, next) {
 
 	//console.log(req.body.essid);
 	//console.log(req.body.mac);
-	res.json("Post command successful received");
+	var response = { response: "Post command successful received"}
+	res.json(response);
 });
 
 //Get command called by the angular client to render the answer of the device
-router.get('/command_list/:user',function(req,res,next){
-	Command.find({device_id: req.user[0].device_id},function(err, commands){
+router.post('/command_list/',function(req,res,next){
+	//console.log(req.body.device_id);
+	//console.log(req.body.action);
+
+	/*Command.find({ $and: [ { device_id: req.body.device_id }, { action: req.body.action } ] },function(err, commands){
 		if(err){ return next(err); }
 		res.json(commands);
-		//console.log(users);
+	});*/
+Command.find({device_id: req.body.device_id},function(err, commands){		
+		if(err){ return next(err); }
+		res.json(commands);
 	});
+//res.json("OK");
 });
 
 //This route allow to delete one or more command

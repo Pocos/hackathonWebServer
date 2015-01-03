@@ -1,8 +1,22 @@
 <h2>Console for user {{device_id}}</h2>
-<div style="background-color: #FFFFFF;">
-	<li ng-repeat=" command in commands track by $index">
-		{{command}}</li>
+<div style="background-color: #FFFFFF;">	
 		<button type="button" ng-click="scanAP()" class="btn btn-default">ScanAP</button>
+		<button type="button" ng-click="connect()" class="btn btn-default" >ConnectAP</button>
 		<button type="button" class="btn btn-default">Dummy</button>
-		<button type="button" class="btn btn-default">Dummy</button>
+		<table border=4 ng-repeat=" command in commands track by $index" ng-show="scanAP_table">
+			<thead>
+				<tr>
+					<td>Mac</td>
+					<td>Essid</td>
+					<td>Rssi</td>
+					<td>{{command.timestamp}}</td>					
+				</tr>
+			</thead>
+			<tr ng-repeat="pay in command.payload">
+				<td>{{pay.mac}}</td>
+				<td>{{pay.ssid}}</td>
+				<td>{{pay.rssi}}</td>
+				<td></td>
+			</tr>
+		</table> 
 	</div>

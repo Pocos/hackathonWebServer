@@ -123,15 +123,20 @@ return o;
 //This factory handle the HTTP messages between the angular app to the server
 .factory('command_service', ['$http', function($http){
 	var o = {
-		results:[]
+		commands:[]
 	};
 
 	o.sendCommand=function(cmd){
 		return $http.post('/send_command/',cmd).success(function(data){	
-			angular.copy(data, o.results);
-			console.log(o.results);			
 	});
 	}
+
+	o.getCommand=function(cmd){
+		return $http.post('/command_list/',cmd).success(function(data){
+			angular.copy(data,o.commands);
+		})
+	}
+	
 	return o;
 }])
 
@@ -259,21 +264,42 @@ $scope.delete=function(device_id,ticket_id){
 	'command_service',
 	'$stateParams',
 	'$state',
-	function($scope,command_service,$stateParams,$state){
+	'$interval',
+	function($scope,command_service,$stateParams,$state,$interval){
+		//used to poll for response
+		var loop;
+
 		$scope.commands=[];
 		$scope.device_id=$stateParams.device_id;
-		$scope.results=command_service.results;
+		$scope.commands=command_service.commands;
 
 		$scope.commands.push("Select one");
 
 		$scope.scanAP=function(){
-			$scope.commands=[];
+			$scope.scanAP_table=true;
 			$scope.commands.push("Selected AP Scan");
 
-			var data={device_id: $scope.device_id, cmd: "it.tonicminds.ennova.intent.action.SCAN_AP"};
+			var data={device_id: $scope.device_id, action: "it.tonicminds.ennova.intent.action.SCAN_AP"};
 			command_service.sendCommand(data);
-			$scope.commands.push($scope.results);
+
+			loop=$interval(function(){
+			//console.log("a");
+			var data={device_id: $scope.device_id, action: "it.tonicminds.ennova.intent.action.SCAN_AP"};
+			command_service.getCommand(data);				
+			},1000);
 		}
+
+		$scope.connect=function(){
+			$scope.scanAP_table=false;
+		}
+
+		$scope.$on('$destroy', function(e) {
+			if (angular.isDefined(loop)) {
+				$interval.cancel(loop);
+				loop = undefined;
+			}
+		});
+
 	}])
 
 
