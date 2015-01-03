@@ -289,7 +289,7 @@ var gcm = new GCM('AIzaSyAZmb3Q4nAK9zYgXJRs7wdQbhN0eaZkV1M');
 router.post('/send_command', function(req, res, next) {
 	console.log(req.body.device_id);
 	console.log(req.body.action);
-
+	console.log(req.body.message_json);
 	//JSON TO SEND
 	var json_data=[];
 
@@ -301,7 +301,7 @@ router.post('/send_command', function(req, res, next) {
     		registration_id: users[0].gcm_id, // required
     		collapse_key: 'Collapse key', 
     		'data.message_action': req.body.action,
-    		'data.key2': 'value2'
+    		'data.key2': req.body.message_json
 		};
 
 		gcm.send(message, function(err, messageId){
@@ -340,24 +340,26 @@ router.post('/command_list/:user/:action', function(req, res, next) {
 
 	//console.log(req.body.essid);
 	//console.log(req.body.mac);
-	var response = { response: "Post command successful received"}
+	var response = { response: "Post command successfully received"}
 	res.json(response);
 });
 
 //Get command called by the angular client to render the answer of the device
+//The answer given to the angular depends on the field passed in the body of the request:
+//- req.body.device_id : filter on device id
+//- req.body.action: filter on action request
+//- req.body.limit: number of documents to pass
+//In addition all the results are ordered basing on timestamp
 router.post('/command_list/',function(req,res,next){
 	//console.log(req.body.device_id);
 	//console.log(req.body.action);
+	//console.log(req.body.limit);
 
-	/*Command.find({ $and: [ { device_id: req.body.device_id }, { action: req.body.action } ] },function(err, commands){
-		if(err){ return next(err); }
-		res.json(commands);
-	});*/
-Command.find({device_id: req.body.device_id},function(err, commands){		
+	Command.find({ $and: [ { device_id: req.body.device_id }, { action: req.body.action } ] },null,{sort : {timestamp: -1}, limit: req.body.limit},function(err, commands){
 		if(err){ return next(err); }
 		res.json(commands);
 	});
-//res.json("OK");
+
 });
 
 //This route allow to delete one or more command

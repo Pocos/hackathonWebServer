@@ -1,22 +1,78 @@
 <h2>Console for user {{device_id}}</h2>
 <div style="background-color: #FFFFFF;">	
-		<button type="button" ng-click="scanAP()" class="btn btn-default">ScanAP</button>
-		<button type="button" ng-click="connect()" class="btn btn-default" >ConnectAP</button>
-		<button type="button" class="btn btn-default">Dummy</button>
-		<table border=4 ng-repeat=" command in commands track by $index" ng-show="scanAP_table">
-			<thead>
-				<tr>
-					<td>Mac</td>
-					<td>Essid</td>
-					<td>Rssi</td>
-					<td>{{command.timestamp}}</td>					
-				</tr>
-			</thead>
-			<tr ng-repeat="pay in command.payload">
-				<td>{{pay.mac}}</td>
-				<td>{{pay.ssid}}</td>
-				<td>{{pay.rssi}}</td>
-				<td></td>
+	<button type="button" ng-click="scanAP()" class="btn btn-default">ScanAP</button>
+	<button type="button" ng-click="connectWifi()" class="btn btn-default" >ConnectAP</button>
+	<button type="button" ng-click="wifi_status()" class="btn btn-default">WIFI Status</button>
+	<button type="button" ng-click="vpn()" class="btn btn-default">Manage VPN</button>
+	<button type="button" ng-click="apk()" class="btn btn-default">Manage APKs</button>
+	<!-- SCAN AP PART-->
+	<table border=4 ng-repeat=" command in commands track by $index" ng-show="scanAP_view">
+		<thead>
+			<tr>
+				<td>Mac</td>
+				<td>Ssid</td>
+				<td>Rssi</td>
+				<td>{{command.timestamp}}</td>					
 			</tr>
-		</table> 
+		</thead>
+		<tr ng-repeat="pay in command.payload">
+			<td>{{pay.mac}}</td>
+			<td>{{pay.ssid}}</td>
+			<td>{{pay.rssi}}</td>
+			<td></td>
+		</tr>
+	</table>
+	<!--CONNECT AP PART -->
+	<div ng-repeat="command in commands track by $index" ng-show="connectAP_view">
+	<select ng-model="aps_list" ng-options="payload.ssid for payload in command.payload" ng-change="changeAP(aps_list)">
+	 <option value="">-- choose an AP --</option>
+	</select>
 	</div>
+	<form role="form" ng-submit="connectAP(aps_list)" ng-show="connectAP_view">
+	<div class="form-group">
+		<input type="password" class="form-control" ng-model="pwd_text" placeholder="Insert password">
+	</div>	
+	</form>
+	<!-- WIFI STATUS PART-->
+	<table border=4 ng-repeat=" command in commands track by $index" ng-show="wifi_status_view">
+		<thead>
+			<tr>
+				<td>SSid</td>
+				<td>Connected</td>
+				<td>Last Check</td>
+			</tr>
+		</thead>
+		<tr>
+			<td>{{command.payload.ssid}}</td>
+			<td>{{command.payload.wifi_status_ok}}</td>
+			<td>{{command.timestamp}}
+		</tr>
+	</table>
+	<!-- VPN PART -->
+	<p ng-show="vpn_view && !commands.length">Currently there are no information available on VPN status
+		<a ng-click="connect()">Connect</a>
+	</p>
+	<div ng-repeat="command in commands track by $index" ng-show="vpn_view">
+		<h3>VPN STATUS = {{command.payload.opened}}</h3>
+		<a ng-show="command.payload.opened" ng-click="disconnectVPN()">Disconnect</a>
+		<a ng-hide="command.payload.opened" ng-click="connectVPN()">Connect</a>
+	</div>
+	<!-- APK PART -->
+	<p ng-show="apk_view && !commands.length">Currently there are no information available on installed APKs
+		<a ng-click="requestAPKs()">Request APKs List</a>
+	</p>
+	<table border=4 ng-repeat=" command in commands track by $index" ng-show="apk_view">
+		<thead>
+			<tr>
+				<td>AppName</td>
+				<td>Version</td>				
+				<td>{{command.timestamp}}</td>					
+			</tr>
+		</thead>
+		<tr ng-repeat="pay in command.payload">
+			<td>{{pay.app_name}}</td>
+			<td>{{pay.version}}</td>
+			<td></td>
+		</tr>
+	</table>	
+</div>

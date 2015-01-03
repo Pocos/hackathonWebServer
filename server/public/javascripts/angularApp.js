@@ -128,7 +128,7 @@ return o;
 
 	o.sendCommand=function(cmd){
 		return $http.post('/send_command/',cmd).success(function(data){	
-	});
+		});
 	}
 
 	o.getCommand=function(cmd){
@@ -256,7 +256,7 @@ $scope.delete=function(device_id,ticket_id){
 	service.getUserTicketList(device_id);
 }
 
-	}])
+}])
 
 
 .controller('UserGcmController', [
@@ -273,34 +273,159 @@ $scope.delete=function(device_id,ticket_id){
 		$scope.device_id=$stateParams.device_id;
 		$scope.commands=command_service.commands;
 
-		$scope.commands.push("Select one");
+		//Sometimes you need to use old-fashioned style to get data, because here the $scope.aps_list
+		//doesn't work
+		var selectedAP="";
+		
+		//--------------SCAN AP PART-------------------------
 
 		$scope.scanAP=function(){
-			$scope.scanAP_table=true;
-			$scope.commands.push("Selected AP Scan");
+			$scope.scanAP_view=true;
+			$scope.connectAP_view=false;
+			$scope.wifi_status_view=false;
+			$scope.vpn_view=false;
+			$scope.apk_view=false;
+		//	$scope.commands.push("Selected AP Scan");
+		if (angular.isDefined(loop)) {
+			$interval.cancel(loop);
+			loop = undefined;
+		}
 
-			var data={device_id: $scope.device_id, action: "it.tonicminds.ennova.intent.action.SCAN_AP"};
-			command_service.sendCommand(data);
+		var data={device_id: $scope.device_id, action: "it.tonicminds.ennova.intent.action.SCAN_AP",message_json :{}};
+		command_service.sendCommand(data);
 
-			loop=$interval(function(){
-			//console.log("a");
-			var data={device_id: $scope.device_id, action: "it.tonicminds.ennova.intent.action.SCAN_AP"};
+		loop=$interval(function(){
+			//Prepare the conditions to search for in the DB. Limit is the number of items to be displayer
+			//if the limit is unset all the results will be displayed
+			var data={device_id: $scope.device_id, action: "SCAN_AP", limit: ""};
 			command_service.getCommand(data);				
-			},1000);
-		}
+		},1000);
+	}
 
-		$scope.connect=function(){
-			$scope.scanAP_table=false;
-		}
-
-		$scope.$on('$destroy', function(e) {
+		//---------------------------CONNECT AP PART---------------------------------
+		$scope.connectWifi=function(){
+			$scope.scanAP_view=false;
+			$scope.connectAP_view=true;
+			$scope.wifi_status_view=false;
+			$scope.vpn_view=false;
+			$scope.apk_view=false;
 			if (angular.isDefined(loop)) {
 				$interval.cancel(loop);
 				loop = undefined;
 			}
-		});
 
-	}])
+			var data={device_id: $scope.device_id, action: "SCAN_AP", limit: "1"};
+			command_service.getCommand(data);
+			console.log($scope.commands);
+
+		}
+
+		$scope.changeAP=function(aps_list){
+			selectedAP=aps_list.ssid;
+		}
+
+		$scope.connectAP=function(){
+			console.log(selectedAP);
+			console.log($scope.pwd_text)
+			var data={device_id: $scope.device_id, action: "it.tonicminds.ennova.intent.action.CONNECT_TO_WIFI",message_json : {ssid: selectedAP, password: $scope.pwd_text}};
+			command_service.sendCommand(data);
+			$scope.pwd_text="";		
+		}
+
+	//---------------------------- WIFI STATUS PART -----------------------------------
+	$scope.wifi_status=function(){
+		$scope.scanAP_view=false;
+		$scope.connectAP_view=false;
+		$scope.wifi_status_view=true;
+		$scope.vpn_view=false;
+		$scope.apk_view=false;
+		if (angular.isDefined(loop)) {
+			$interval.cancel(loop);
+			loop = undefined;
+		}
+		
+
+		loop=$interval(function(){
+			//Prepare the conditions to search for in the DB. Limit is the number of items to be displayer
+			//if the limit is unset all the results will be displayed			
+			var data={device_id: $scope.device_id, action: "WIFI_STATUS", limit: ""};
+			command_service.getCommand(data);				
+		},1000);
+
+	}
+
+//---------------------------- VPN PART -----------------------------------
+	$scope.vpn=function(){
+		$scope.scanAP_view=false;
+		$scope.connectAP_view=false;
+		$scope.wifi_status_view=false;
+		$scope.vpn_view=true;
+		$scope.apk_view=false;
+		if (angular.isDefined(loop)) {
+			$interval.cancel(loop);
+			loop = undefined;
+		}
+
+		loop=$interval(function(){
+			//Prepare the conditions to search for in the DB. Limit is the number of items to be displayer
+			//if the limit is unset all the results will be displayed			
+			var data={device_id: $scope.device_id, action: "VPN", limit: "1"};
+			command_service.getCommand(data);				
+		},1000);
+	}
+
+	$scope.connectVPN=function(){
+		var data={device_id: $scope.device_id, action: "it.tonicminds.ennova.intent.action.VPN",message_json : {open: "true"}};
+		command_service.sendCommand(data);
+	}
+
+	$scope.disconnectVPN=function(){
+		var data={device_id: $scope.device_id, action: "it.tonicminds.ennova.intent.action.VPN",message_json : {open: "false"}};
+		command_service.sendCommand(data);	
+	}
+
+//---------------------------- APK PART -----------------------------------
+	$scope.apk=function(){
+		$scope.scanAP_view=false;
+		$scope.connectAP_view=false;
+		$scope.wifi_status_view=false;
+		$scope.vpn_view=false;
+		$scope.apk_view=true;
+
+		if (angular.isDefined(loop)) {
+			$interval.cancel(loop);
+			loop = undefined;
+		}
+
+		var data={device_id: $scope.device_id, action: "it.tonicminds.ennova.intent.action.APK_LIST",message_json :{}};
+		command_service.sendCommand(data);	
+
+
+		loop=$interval(function(){
+			//Prepare the conditions to search for in the DB. Limit is the number of items to be displayer
+			//if the limit is unset all the results will be displayed			
+			var data={device_id: $scope.device_id, action: "APK_LIST", limit: "1"};
+			command_service.getCommand(data);				
+		},1000);	
+	}
+
+	$scope.requestAPKs=function(){
+		var data={device_id: $scope.device_id, action: "it.tonicminds.ennova.intent.action.APK_LIST",message_json :{}};
+		command_service.sendCommand(data);	
+	}
+//---------------------------- SPEAK PART -----------------------------------
+
+
+
+
+$scope.$on('$destroy', function(e) {
+	if (angular.isDefined(loop)) {
+		$interval.cancel(loop);
+		loop = undefined;
+	}
+});
+
+}])
 
 
 .controller('UserConsole', [
