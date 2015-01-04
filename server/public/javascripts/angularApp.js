@@ -285,6 +285,8 @@ $scope.delete=function(device_id,ticket_id){
 			$scope.wifi_status_view=false;
 			$scope.vpn_view=false;
 			$scope.apk_view=false;
+			$scope.speak_view=false;
+
 		//	$scope.commands.push("Selected AP Scan");
 		if (angular.isDefined(loop)) {
 			$interval.cancel(loop);
@@ -309,6 +311,8 @@ $scope.delete=function(device_id,ticket_id){
 			$scope.wifi_status_view=false;
 			$scope.vpn_view=false;
 			$scope.apk_view=false;
+			$scope.speak_view=false;
+
 			if (angular.isDefined(loop)) {
 				$interval.cancel(loop);
 				loop = undefined;
@@ -339,6 +343,8 @@ $scope.delete=function(device_id,ticket_id){
 		$scope.wifi_status_view=true;
 		$scope.vpn_view=false;
 		$scope.apk_view=false;
+		$scope.speak_view=false;
+
 		if (angular.isDefined(loop)) {
 			$interval.cancel(loop);
 			loop = undefined;
@@ -361,6 +367,8 @@ $scope.delete=function(device_id,ticket_id){
 		$scope.wifi_status_view=false;
 		$scope.vpn_view=true;
 		$scope.apk_view=false;
+		$scope.speak_view=false;
+
 		if (angular.isDefined(loop)) {
 			$interval.cancel(loop);
 			loop = undefined;
@@ -391,6 +399,7 @@ $scope.delete=function(device_id,ticket_id){
 		$scope.wifi_status_view=false;
 		$scope.vpn_view=false;
 		$scope.apk_view=true;
+		$scope.speak_view=false;
 
 		if (angular.isDefined(loop)) {
 			$interval.cancel(loop);
@@ -413,8 +422,43 @@ $scope.delete=function(device_id,ticket_id){
 		var data={device_id: $scope.device_id, action: "it.tonicminds.ennova.intent.action.APK_LIST",message_json :{}};
 		command_service.sendCommand(data);	
 	}
-//---------------------------- SPEAK PART -----------------------------------
 
+	$scope.show_APK_form=function(){
+		$scope.install_apk_view=true;
+	}
+
+	$scope.installAPK=function(){
+		$scope.install_apk_view=false;
+		//console.log($scope.apk_URL_text);
+		//console.log($scope.apk_name_text);
+
+		var data={device_id: $scope.device_id, action: "it.tonicminds.ennova.intent.action.INSTALL_APK",message_json : {url: $scope.apk_URL_text, app_name: $scope.apk_name_text}};
+		command_service.sendCommand(data);	
+
+		$scope.apk_URL_text="";
+		$scope.apk_name_text="";
+	}
+
+//---------------------------- SPEAK PART -----------------------------------
+	$scope.speak=function(){
+		$scope.scanAP_view=false;
+		$scope.connectAP_view=false;
+		$scope.wifi_status_view=false;
+		$scope.vpn_view=false;
+		$scope.apk_view=false;
+		$scope.speak_view=true;
+
+		if (angular.isDefined(loop)) {
+			$interval.cancel(loop);
+			loop = undefined;
+		}
+	}
+
+	$scope.speak_now=function(){
+		console.log($scope.speak_text);
+		var data={device_id: $scope.device_id, action: "it.tonicminds.ennova.intent.action.SPEAK",message_json : {text: $scope.speak_text}};
+		command_service.sendCommand(data);
+	}
 
 
 

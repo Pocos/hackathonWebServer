@@ -5,6 +5,7 @@
 	<button type="button" ng-click="wifi_status()" class="btn btn-default">WIFI Status</button>
 	<button type="button" ng-click="vpn()" class="btn btn-default">Manage VPN</button>
 	<button type="button" ng-click="apk()" class="btn btn-default">Manage APKs</button>
+	<button type="button" ng-click="speak()" class="btn btn-default">Speak</button>
 	<!-- SCAN AP PART-->
 	<table border=4 ng-repeat=" command in commands track by $index" ng-show="scanAP_view">
 		<thead>
@@ -50,7 +51,7 @@
 	</table>
 	<!-- VPN PART -->
 	<p ng-show="vpn_view && !commands.length">Currently there are no information available on VPN status
-		<a ng-click="connect()">Connect</a>
+		<a ng-click="connectVPN()">Connect</a>
 	</p>
 	<div ng-repeat="command in commands track by $index" ng-show="vpn_view">
 		<h3>VPN STATUS = {{command.payload.opened}}</h3>
@@ -59,8 +60,21 @@
 	</div>
 	<!-- APK PART -->
 	<p ng-show="apk_view && !commands.length">Currently there are no information available on installed APKs
-		<a ng-click="requestAPKs()">Request APKs List</a>
+		<a ng-click="requestAPKs()">Request APKs list</a><br>
+		<a ng-click="show_APK_form()">Install APK</a>
 	</p>
+	<div ng-show="apk_view && commands.lenght">
+		<a ng-click="requestAPKs()">Request APKs list</a><br>
+		<a ng-click="show_APK_form()">Install APK</a>
+	</div>
+	<div ng-show="install_apk_view">
+		<form ng-submit="installAPK()">
+  			Enter informations and hit Enter:
+  			<input type="url" class="form-control" ng-model="apk_URL_text" placeholder="Insert URL in the format: http://www.sito.it/programma.apk"/>
+  			<input type="text" class="form-control" ng-model="apk_name_text" placeholder="Insert APK name"/>
+  			<input type="submit" class="form-control" id="apk_submit" value="Submit" />
+		</form>
+	</div>
 	<table border=4 ng-repeat=" command in commands track by $index" ng-show="apk_view">
 		<thead>
 			<tr>
@@ -75,4 +89,12 @@
 			<td></td>
 		</tr>
 	</table>	
+	<!-- SPEAK PART -->
+	<div ng-show="speak_view">
+		<form ng-submit="speak_now()">
+  			Enter text and hit Enter:  			
+  			<input type="text" class="form-control" ng-model="speak_text" placeholder="Insert text"/>
+  			<input type="submit" class="form-control" id="speak_submit" value="Submit" />
+		</form>
+	</div>
 </div>

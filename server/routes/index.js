@@ -301,7 +301,7 @@ router.post('/send_command', function(req, res, next) {
     		registration_id: users[0].gcm_id, // required
     		collapse_key: 'Collapse key', 
     		'data.message_action': req.body.action,
-    		'data.key2': req.body.message_json
+    		'data.message_json': req.body.message_json
 		};
 
 		gcm.send(message, function(err, messageId){
