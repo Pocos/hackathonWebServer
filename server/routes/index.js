@@ -1,14 +1,15 @@
 /*******************FILE DESCRIPTION***********************
 * 
-* This js script handles all the routes for the server. Any GET, POST, etc made by the device or by the angular page
-* pass through here. Below there is the list of the contents. Read each section header for any explanation:
+* This js script handles all the routes for the server. Any GET, POST, etc made by the device or by
+* the angular page pass through here. Below there is the list of the contents.
 * 1 - Render Page Views section
 * 2 - Parameters section
 * 3 - User List operation section
 * 4 - Ticket List operation section
 * 5 - GCM Commands operation section
+*
+* For any explanation on sections 2-5 please refer to the related callback documentation
 **********************************************************/
-
 var express = require('express');
 var mongoose = require('mongoose');
 var User = mongoose.model('User');
@@ -19,6 +20,9 @@ var router = express.Router();
 var GCM = require('gcm').GCM;
 var http = require('http');//to POST to ennova server
 
+var userListRouteHandler = require('./userListRouteHandler');
+var ticketRouteHandler = require('./ticketRouteHandler');
+var commandRouteHandler = require('./commandRouteHandler');
 /*******************SECTION: RENDER PAGE VIEWS***********************
 * 
 * The angular pages requires some html/ejs code to fill textboxes, field, table, and so on. To obtain the code they
@@ -57,382 +61,36 @@ router.get('/partial/user_gcm',function(req,res,next){
 	res.render('user_gcm');
 })
 
-/*******************SECTION: PARAMETERS***********************
-* 
-* PARAMETERS USED TO ATTACH AN HEADER TO A REQUEST.
-* Ex. Post /ticket_list/:user. Before to perform the post ticket_list operation on ticket list we catch the user param,
-* do some operation on this param and then attach it on req.user for the post ticket_list
-*
-* id : contains the value of the parameter
-**********************************************************/
-router.param('user', function(req, res, next, id) {
-	var query;
-	if(id=='all'){
-		query=User.find();	
-	}
-	else
-		query = User.find({device_id : id});
-
-	query.exec(function (err, user){
-		if (err) { return next(err); }
-		if (!user.length) { return next(new Error("can't find user")); }
-
-		req.user = user;
-		return next();
-	});
-});
-
-//Parameter used for the delete operation of the tickets. Note that the route that contains 
-//a ticket param also contains the user param, which is the result of a query on the DB, performed
-// in router.param('user'... and which can be accessed as an header of the request
-//!!! Ex. the route router.delete('/ticket_list/:user/:ticket')
-//!!! router.delete('ticket_list/DEVICE_2/all') 
-//1 - Firstly it is performed a query on the DB to find if the user DEVICE_2 exist, then the result is
-//attached to the header of the request (req.user)
-//2 - Then the result of the query is used to filter the tickets basing on the device_id, obtaining 
-//a list
-//3 - Finally if the ticket param is equal to 'all' all the tickets for that user will be returned,
-//otherwise if only a single ticket id is specified then only that ticket will be returned
-router.param('ticket', function(req, res, next, id) {
-	var query;
-
-	if(id=='all'){
-		//get all the tickets for the user specified, which is in the user header
-		query=Ticket.find({device_id:req.user[0].device_id});	
-	}
-	else
-		//This is the case when we want to delete only one ticket for the specified user.
-		//Since the ticket id is unique in the ticket list an AND condition for the query
-		//Ticket.find({_id:id $AND device_id:req.user[0].device_id}) could be simplified as
-		query = Ticket.find({_id:id}); 
-
-		query.exec(function (err, ticket){
-	//	console.log(ticket);
-	if (err) { return next(err); }
-	if (!ticket.length) { return next(new Error("can't find ticket")); }
-
-	req.ticket = ticket;
-	return next();
-});
-	});
+/*******************SECTION: PARAMETERS*********************************
+* 																	   *
+************************************************************************/
+router.param('user', userListRouteHandler.userParameter);
+router.param('ticket', ticketRouteHandler.ticketParameter);
 
 /*******************SECTION: USER LIST OPERATIONS***********************
-* 
-*
-*
-*
-**********************************************************/
-router.get('/user_list', function(req, res, next) {
-	User.find(function(err, users){
-		if(err){ return next(err); }
-		res.json(users);
-		//console.log(users);
-	});
-});
+*                                                                      *
+************************************************************************/
+router.get('/user_list', userListRouteHandler.getUserList);
+router.post('/user_list/:device_id', userListRouteHandler.insertOrUpdateUser);
+router.delete('/user_list/:user', userListRouteHandler.deleteUser);
 
+/*******************SECTION: TICKET LIST OPERATIONS*********************
+*																	   *
+************************************************************************/
+router.post('/ticket_list/:user', ticketRouteHandler.insertTicket);
+router.get('/ticket_list/:user', ticketRouteHandler.getTicketList);
+router.delete('/ticket_list/:user/:ticket', ticketRouteHandler.deleteTicket);
 
-
-
-//Update the infos about the users, or create a new one. The param device_id is the id that is needed
-//to be inserted/updated
-router.post('/user_list/:device_id', function(req, res, next) {
-	console.log(req.ip);
-	console.log(req.body.device_id);
-	console.log(req.params.device_id);
-
-	//TODO: Is attach the info on the body request the best practice?
-	//Attach the ip address to the body string
-	req.body.device_id=req.params.device_id;
-
-	//Attach the ip address to the body string
-	req.body.ip_address=req.ip;
-	
-	//Attach last login information
-	req.body.last_login=new Date().toUTCString();
-
-	//Set or update the user. We pass the body string of the request
-	var query={device_id:req.body.device_id};
-	User.findOneAndUpdate(query,req.body,{upsert:true}, function(err, user){
-		if(err){ return next(err); }
-		res.json(user);
-	});
-
-//---------------------POST ENNOVA server--------------------------
-var data= JSON.stringify({
-	 "token": "test",
-  	"data": {
-    	"type": "a",
-    	"category": "b",
-    	"subcategory": "c"
-	}
-}) ;
-/*var data = JSON.stringify({
-    token: 'test',
-    data: body_data,
-  });*/
-
-	console.log(data);
-  var options = {
-    host: 'backend-pqixpx9s4p.elasticbeanstalk.com',
-    port: 80,
-    path: '/ticket/create',
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Content-Length': Buffer.byteLength(data)
-    }
-  };
-console.log(options);
-  var httpreq = http.request(options, function (response) {
-    response.setEncoding('utf8');
-    response.on('data', function (chunk) {
-      console.log("body: " + chunk);
-    });
-    response.on('end', function() {
-      //res.send('ok');
-    })
-  });
-  httpreq.write(data);
-  httpreq.end();
-//-----------END POST ENNOVA server
-
-
-});
-
-//This route allow to delete one or more user
-//if the param user is equal to a single user id, just that user will be deleted
-//if the param user is equal to the keyword "all", all the users will be deleted
-
-router.delete('/user_list/:user', function(req, res) {
-	res.setHeader('Content-Type', 'application/json');
-	async.each(req.user,		
-		function(user,callback){
-			console.log(user);
-			User.find({device_id : user.device_id}).remove(function(err){				
-				if(err)
-					res.write("Error on deleting element with 'device_id': '"+user.device_id+"'\n" );
-				else
-					res.write("Successfully deleted element with 'device_id': '"+user.device_id+"'\n");
-				callback();
-			});
-			
-		},
-		function(err){
-			//now all the asynchronous requests to the DB have returned
-			//console.log("finito");
-			res.end("Finish");
-			//res.json("finito");
-		}
-		);
-});
-
-/*******************SECTION: TICKET LIST OPERATIONS***********************
-* 
-* 
-*
-*
-**********************************************************/
-router.post('/ticket_list/:user', function(req, res, next) {
-//add the ticket. You need to user req.user[0] because the user parameter is the result of a query
-//so mongoose returns the results into an array
-
-var ticket = new Ticket();
-ticket.device_id=req.user[0].device_id;
-ticket.timestamp= new Date().toUTCString();
-
-ticket.save(function(err, ticket){
-	if(err){ return next(err); }		
-});
-
-//increment the ticket count for the user
-req.user[0].upcount(function(err,user){
-	if(err){ return next(err); }
-});
-
-res.json({action: "Richiesta ricevuta"});
-});
-
-//Get all the tickets for the user specified, or for all the user if keyword "all" is used for the
-//the user pparam. In this case we need an async each structure to wait until all the tickets for all
-//the users are found
-router.get('/ticket_list/:user', function(req, res, next) {
-	var output=[];
-	async.each(req.user,		
-		function(user,callback){
-			Ticket.find({device_id : user.device_id}).exec(function(err, tickets){
-				if(err){ return next(err); }
-
-				for(var i=0;i<tickets.length;i++)
-					output.push(tickets[i]);
-				callback();
-			});
-			
-		},
-		function(err){
-			//now all the asynchronous request to the DB have returned
-			console.log("finito");
-			console.log(output);
-			res.json(output);
-		}
-		);
-
-});
-
-//This route allow to delete one or more ticket for the user specified
-//if the param ticket is equal to a single ticket id, just that ticket will be deleted
-//if the param ticket is equal to the keyword "all", all the tickets for the user param will be deleted
-router.delete('/ticket_list/:user/:ticket', function(req, res) {
-	res.setHeader('Content-Type', 'application/json');
-	console.log(req.ticket);
-	async.each(req.ticket,		
-		function(ticket,callback){
-			console.log(ticket);
-			Ticket.findById(ticket._id).remove(function(err){				
-				if(err)
-					res.write("Error on deleting element with 'device_id': '"+ticket._id+"'\n" );
-				else{
-					res.write("Successfully deleted element with 'device_id': '"+ticket._id+"'\n");
-					req.user[0].downcount(function(err,user){
-						if(err){ return next(err); }
-					});
-				}
-
-				callback();
-			});
-			
-		},
-		function(err){
-			//now all the asynchron-ous request to the DB have returned
-			//console.log("finito");
-			res.end("Finish");
-			//res.json("finito");
-		}
-		);
-
-});
-
-/*******************SECTION: GCM COMMANDS OPERATIONS***********************
-* 
-* 
-*
-*
-**********************************************************/
-
-//API KEY. You can obtain it from console.developer.google.com
-var gcm = new GCM('AIzaSyAZmb3Q4nAK9zYgXJRs7wdQbhN0eaZkV1M');
-
-//Post command called by the angular client
-router.post('/send_command', function(req, res, next) {
-	console.log(req.body.device_id);
-	console.log(req.body.action);
-	console.log(req.body.message_json);
-	//JSON TO SEND
-	var json_data=[];
-
-	User.find({device_id: req.body.device_id},function(err, users){
-		if(err){ return next(err); }
-		if(!users[0]) 
-		{
-			console.log("User does not exist");
-			return;
-		}
-		if(err){ return next(err); }
-		//console.log(users);
-
-		var message = {
-    		registration_id: users[0].gcm_id, // required
-    		collapse_key: 'Collapse key', 
-    		'data.message_action': req.body.action,
-    		'data.message_json': JSON.stringify(req.body.message_json)
-		};
-		console.log("------------Sending gcm message----------");
-		console.log(message);
-
-		gcm.send(message, function(err, messageId){
-			if (err) {
-				console.log("Something has gone wrong on GCM send message!");
-			}else {
-			console.log("Sent with message ID: ", messageId);			
-			}
-		});
-		//console.log(users);
-	});
-
-	//il client angular è in attesa di una risposta
-	//res.json({resp:"Command sent"});
-	res.json("OK");
-});
-
-//Post command called by the device as answer of a requested action
-router.post('/command_list/:user/:action', function(req, res, next) {
-	console.log(req.user[0].device_id);
-	console.log(req.params.action);
-	/*for(var i=0; i<req.body.length;i++){
-		console.log(req.body[i]);
-	}*/
-
-	var command = new Command();
-	command.device_id=req.user[0].device_id;
-	command.timestamp=new Date().toUTCString();
-	command.action= req.params.action;
-	command.payload=req.body;
-
-
-	command.save(function(err, command){
-		if(err){ return next(err); }		
-	});
-
-	//console.log(req.body.essid);
-	//console.log(req.body.mac);
-	var response = { response: "Post command successfully received"}
-	res.json(response);
-});
-
-//Get command called by the angular client to render the answer of the device
-//The answer given to the angular depends on the field passed in the body of the request:
-//- req.body.device_id : filter on device id
-//- req.body.action: filter on action request
-//- req.body.limit: number of documents to pass
-//In addition all the results are ordered basing on timestamp
-router.post('/command_list/',function(req,res,next){
-	//console.log(req.body.device_id);
-	//console.log(req.body.action);
-	//console.log(req.body.limit);
-
-	Command.find({ $and: [ { device_id: req.body.device_id }, { action: req.body.action } ] },null,{sort : {timestamp: -1}, limit: req.body.limit},function(err, commands){
-		if(err){ return next(err); }
-		console.log(commands);
-		res.json(commands);
-	});
-
-});
-
-//This route allow to delete one or more command
-//if the param user is equal to a single user id, only the commands for that user are deleted
-//if the param user is equal to the keyword "all", all the commands are deleted
-router.delete('/command_list/:user', function(req, res) {
-	res.setHeader('Content-Type', 'application/json');
-	async.each(req.user,		
-		function(user,callback){
-			console.log(user);
-			Command.find({device_id : user.device_id}).remove(function(err){				
-				if(err)
-					res.write("Error on deleting commands for 'device_id': '"+user.device_id+"'\n" );
-				else
-					res.write("Successfully deleted commands for 'device_id': '"+user.device_id+"'\n");
-				callback();
-			});
-			
-		},
-		function(err){
-			//now all the asynchronous requests to the DB have returned
-			//console.log("finito");
-			res.end("Finish");
-			//res.json("finito");
-		}
-		);
-});
-
+/*******************SECTION: GCM COMMANDS OPERATIONS********************
+*         															   *
+************************************************************************/
+//Angular -> Server --GCM--> device
+router.post('/send_command', commandRouteHandler.sendGCMCommand);
+//device --> Server
+router.post('/command_list/:user/:action', commandRouteHandler.answerGCM);
+//Angular --> Server
+router.post('/command_list/',commandRouteHandler.getCommandList);
+router.delete('/command_list/:user', commandRouteHandler.deleteCommand);
 
 
 module.exports = router;
