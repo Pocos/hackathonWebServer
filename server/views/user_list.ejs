@@ -21,8 +21,8 @@
 		<td>{{user.total_tickets}}</td>
 		<td>{{user.ip_address}}</td>
 		<td>{{user.last_login}}</td>
-		<td><a ng-href="#/ticket_list/{{user.device_id}}">Ticket List</a></td>
-		<td><a ng-href="#/user_gcm/{{user.device_id}}">Open Console</a></td>
-		<td><a ng-click="delete(user.device_id)">Delete User</a></td>
+		<td><a class="btn btn-primary" ng-href="#/ticket_list/{{user.device_id}}">Ticket List</a></td>
+		<td><a class="btn btn-primary" ng-href="#/user_gcm/{{user.device_id}}">Open Console</a></td>
+		<td><a class="btn btn-primary" ng-click="delete(user.device_id)">Delete User</a></td>
 	</td></tr></table>
 	Automatic Refresh: <input type="checkbox" ng-model="refresh" ng-change="change()"> <br/>

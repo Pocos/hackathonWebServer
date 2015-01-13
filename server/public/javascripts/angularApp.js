@@ -128,6 +128,7 @@ return o;
 
 	o.sendCommand=function(cmd){
 		return $http.post('/send_command/',cmd).success(function(data){	
+			Console.log(cmd);
 		});
 	}
 
@@ -136,7 +137,12 @@ return o;
 			angular.copy(data,o.commands);
 		})
 	}
-	
+
+	o.deleteCommand=function(device_id){
+		return $http.delete('/command_list/'+device_id).success(function(data){
+			angular.copy(data,o.commands);
+		});
+	}	
 	return o;
 }])
 
@@ -183,11 +189,17 @@ return o;
 	'service',
 	'$state',
 	function($scope,service,$state){
-		$scope.state=$state;
+		$scope.activeTab="home";
+		/*$scope.state=$state;
 		console.log($scope.state);
 		$scope.state=$state.current;
 		console.log($scope.state);
-		
+		*/
+		console.log($scope.activeTab);
+
+		$scope.changeTab=function(tab){			
+			$scope.activeTab=tab;
+		}
 	}])
 
 .controller('UserListController', [
@@ -195,7 +207,8 @@ return o;
 	'service',
 	'$state',
 	'$interval',
-	function($scope,service,$state,$interval){
+	'command_service',
+	function($scope,service,$state,$interval,command_service){
 		//used for refresh purpose
 		var loop;
 		service.getUserList();
@@ -203,11 +216,14 @@ return o;
 
 //Delete all the tickets for the specified user and then delete the user
 $scope.delete=function(device_id){
+	command_service.deleteCommand(device_id);
 	service.deleteUserTicketList(device_id);
 	service.deleteUser(device_id);
-			//Refresh the view
-			service.getUserList();
-		}
+	
+	//Refresh the view
+	service.getUserList();
+
+}
 		
 //Refresh user_list without to reload whole page
 $scope.change=function(){
@@ -286,6 +302,7 @@ $scope.delete=function(device_id,ticket_id){
 			$scope.vpn_view=false;
 			$scope.apk_view=false;
 			$scope.speak_view=false;
+			$scope.install_apk_view=false;
 
 		//	$scope.commands.push("Selected AP Scan");
 		if (angular.isDefined(loop)) {
@@ -299,7 +316,7 @@ $scope.delete=function(device_id,ticket_id){
 		loop=$interval(function(){
 			//Prepare the conditions to search for in the DB. Limit is the number of items to be displayer
 			//if the limit is unset all the results will be displayed
-			var data={device_id: $scope.device_id, action: "SCAN_AP", limit: ""};
+			var data={device_id: $scope.device_id, action: "SCAN_AP", limit: "1"};
 			command_service.getCommand(data);				
 		},1000);
 	}
@@ -312,6 +329,7 @@ $scope.delete=function(device_id,ticket_id){
 			$scope.vpn_view=false;
 			$scope.apk_view=false;
 			$scope.speak_view=false;
+			$scope.install_apk_view=false;
 
 			if (angular.isDefined(loop)) {
 				$interval.cancel(loop);
@@ -344,6 +362,7 @@ $scope.delete=function(device_id,ticket_id){
 		$scope.vpn_view=false;
 		$scope.apk_view=false;
 		$scope.speak_view=false;
+		$scope.install_apk_view=false;
 
 		if (angular.isDefined(loop)) {
 			$interval.cancel(loop);
@@ -354,7 +373,7 @@ $scope.delete=function(device_id,ticket_id){
 		loop=$interval(function(){
 			//Prepare the conditions to search for in the DB. Limit is the number of items to be displayer
 			//if the limit is unset all the results will be displayed			
-			var data={device_id: $scope.device_id, action: "WIFI_STATUS", limit: ""};
+			var data={device_id: $scope.device_id, action: "WIFI_STATUS", limit: "1"};
 			command_service.getCommand(data);				
 		},1000);
 
@@ -368,6 +387,7 @@ $scope.delete=function(device_id,ticket_id){
 		$scope.vpn_view=true;
 		$scope.apk_view=false;
 		$scope.speak_view=false;
+		$scope.install_apk_view=false;
 
 		if (angular.isDefined(loop)) {
 			$interval.cancel(loop);
@@ -400,6 +420,7 @@ $scope.delete=function(device_id,ticket_id){
 		$scope.vpn_view=false;
 		$scope.apk_view=true;
 		$scope.speak_view=false;
+		$scope.install_apk_view=false;
 
 		if (angular.isDefined(loop)) {
 			$interval.cancel(loop);
@@ -447,6 +468,7 @@ $scope.delete=function(device_id,ticket_id){
 		$scope.vpn_view=false;
 		$scope.apk_view=false;
 		$scope.speak_view=true;
+		$scope.install_apk_view=false;
 
 		if (angular.isDefined(loop)) {
 			$interval.cancel(loop);
@@ -457,6 +479,7 @@ $scope.delete=function(device_id,ticket_id){
 	$scope.speak_now=function(){
 		console.log($scope.speak_text);
 		var data={device_id: $scope.device_id, action: "it.tonicminds.ennova.intent.action.SPEAK",message_json : {text: $scope.speak_text}};
+		$scope.speak_text="";
 		command_service.sendCommand(data);
 	}
 

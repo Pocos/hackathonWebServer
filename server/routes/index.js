@@ -17,6 +17,7 @@ var Command = mongoose.model('Command');
 var async = require('async');
 var router = express.Router();
 var GCM = require('gcm').GCM;
+var http = require('http');//to POST to ennova server
 
 /*******************SECTION: RENDER PAGE VIEWS***********************
 * 
@@ -139,12 +140,6 @@ router.post('/user_list/:device_id', function(req, res, next) {
 	console.log(req.body.device_id);
 	console.log(req.params.device_id);
 
-	//if(req.body.device_id==null || req.body.device_id=='' || req.body.device_id=='undefined'){
-	//	if(!req.body.device_id){
-	//		return res.end("Request Malformed");
-	//	}
-
-
 	//TODO: Is attach the info on the body request the best practice?
 	//Attach the ip address to the body string
 	req.body.device_id=req.params.device_id;
@@ -161,6 +156,47 @@ router.post('/user_list/:device_id', function(req, res, next) {
 		if(err){ return next(err); }
 		res.json(user);
 	});
+
+//---------------------POST ENNOVA server--------------------------
+var data= JSON.stringify({
+	 "token": "test",
+  	"data": {
+    	"type": "a",
+    	"category": "b",
+    	"subcategory": "c"
+	}
+}) ;
+/*var data = JSON.stringify({
+    token: 'test',
+    data: body_data,
+  });*/
+
+	console.log(data);
+  var options = {
+    host: 'backend-pqixpx9s4p.elasticbeanstalk.com',
+    port: 80,
+    path: '/ticket/create',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': Buffer.byteLength(data)
+    }
+  };
+console.log(options);
+  var httpreq = http.request(options, function (response) {
+    response.setEncoding('utf8');
+    response.on('data', function (chunk) {
+      console.log("body: " + chunk);
+    });
+    response.on('end', function() {
+      //res.send('ok');
+    })
+  });
+  httpreq.write(data);
+  httpreq.end();
+//-----------END POST ENNOVA server
+
+
 });
 
 //This route allow to delete one or more user
@@ -295,14 +331,22 @@ router.post('/send_command', function(req, res, next) {
 
 	User.find({device_id: req.body.device_id},function(err, users){
 		if(err){ return next(err); }
+		if(!users[0]) 
+		{
+			console.log("User does not exist");
+			return;
+		}
+		if(err){ return next(err); }
 		//console.log(users);
 
 		var message = {
     		registration_id: users[0].gcm_id, // required
     		collapse_key: 'Collapse key', 
     		'data.message_action': req.body.action,
-    		'data.message_json': req.body.message_json
+    		'data.message_json': JSON.stringify(req.body.message_json)
 		};
+		console.log("------------Sending gcm message----------");
+		console.log(message);
 
 		gcm.send(message, function(err, messageId){
 			if (err) {
@@ -357,6 +401,7 @@ router.post('/command_list/',function(req,res,next){
 
 	Command.find({ $and: [ { device_id: req.body.device_id }, { action: req.body.action } ] },null,{sort : {timestamp: -1}, limit: req.body.limit},function(err, commands){
 		if(err){ return next(err); }
+		console.log(commands);
 		res.json(commands);
 	});
 
