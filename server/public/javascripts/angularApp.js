@@ -195,7 +195,7 @@ return o;
 		$scope.state=$state.current;
 		console.log($scope.state);
 		*/
-		console.log($scope.activeTab);
+		//console.log($scope.activeTab);
 
 		$scope.changeTab=function(tab){			
 			$scope.activeTab=tab;
@@ -516,8 +516,7 @@ $scope.$on('$destroy', function(e) {
 			$scope.commands.push("Connection Opened");
 		})		
 
-		//Send gcm command to open websocket		
-
+		//Send gcm command to open websocket
 		$scope.send_command=function(){
 			socket.emit('command_issued',{device_id: $scope.device_id, cmd: $scope.cmd_text});
 			$scope.commands.push($scope.cmd_text);

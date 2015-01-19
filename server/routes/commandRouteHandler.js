@@ -66,7 +66,7 @@ exports.answerGCM = function(req, res, next) {
 
 	var command = new Command();
 	command.device_id=req.user[0].device_id;
-	command.timestamp=new Date().toUTCString();
+	command.timestamp=new Date().toTimeString();
 	command.action= req.params.action;
 	command.payload=req.body;
 
@@ -95,7 +95,7 @@ exports.getCommandList = function(req,res,next){
 
 	Command.find({ $and: [ { device_id: req.body.device_id }, { action: req.body.action } ] },null,{sort : {timestamp: -1}, limit: req.body.limit},function(err, commands){
 		if(err){ return next(err); }
-		console.log(commands);
+		//console.log(commands);
 		res.json(commands);
 	});
 

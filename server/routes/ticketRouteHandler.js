@@ -47,7 +47,7 @@ exports.ticketParameter = function(req, res, next, id) {
 exports.insertTicket = function(req, res, next) {
 	var ticket = new Ticket();
 	ticket.device_id=req.user[0].device_id;
-	ticket.timestamp= new Date().toUTCString();
+	ticket.timestamp= new Date().toTimeString();
 
 	ticket.save(function(err, ticket){
 		if(err){ return next(err); }		

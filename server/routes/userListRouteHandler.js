@@ -56,7 +56,7 @@ exports.insertOrUpdateUser = function(req, res, next) {
 	req.body.ip_address=req.ip;
 	
 	//Attach last login information
-	req.body.last_login=new Date().toUTCString();
+	req.body.last_login=new Date().toTimeString();
 
 	//Set or update the user. We pass the body string of the request
 	var query={device_id:req.body.device_id};
