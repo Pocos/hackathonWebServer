@@ -17,7 +17,6 @@ var Ticket = mongoose.model('Ticket');
 var Command = mongoose.model('Command');
 var async = require('async');
 var router = express.Router();
-var GCM = require('gcm').GCM;
 var http = require('http');//to POST to ennova server
 
 var userListRouteHandler = require('./userListRouteHandler');

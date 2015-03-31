@@ -5,7 +5,6 @@ var Ticket = mongoose.model('Ticket');
 var Command = mongoose.model('Command');
 var async = require('async');
 var router = express.Router();
-var GCM = require('gcm').GCM;
 var http = require('http');//to POST to ennova server
 
 /*******************SECTION: PARAMETERS***********************
@@ -56,8 +55,8 @@ exports.insertOrUpdateUser = function(req, res, next) {
 	req.body.ip_address=req.ip;
 	
 	//Attach last login information
-	req.body.last_login=new Date().toTimeString();
-
+	//req.body.last_login=new Date().toTimeString();
+  req.body.last_login=new Date().toUTCString();
 	//Set or update the user. We pass the body string of the request
 	var query={device_id:req.body.device_id};
 	User.findOneAndUpdate(query,req.body,{upsert:true}, function(err, user){

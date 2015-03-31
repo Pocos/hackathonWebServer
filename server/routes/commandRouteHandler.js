@@ -58,15 +58,16 @@ exports.sendGCMCommand = function(req, res, next) {
 //device --> Server
 //Post command called by the device as answer of a requested action, made by a GCM message
 exports.answerGCM = function(req, res, next) {
-	console.log(req.user[0].device_id);
-	console.log(req.params.action);
+	//console.log(req.user[0].device_id);
+	//console.log(req.params.action);
 	/*for(var i=0; i<req.body.length;i++){
 		console.log(req.body[i]);
 	}*/
 
 	var command = new Command();
 	command.device_id=req.user[0].device_id;
-	command.timestamp=new Date().toTimeString();
+	//command.timestamp=new Date().toTimeString();
+	command.timestamp=new Date().toUTCString();
 	command.action= req.params.action;
 	command.payload=req.body;
 

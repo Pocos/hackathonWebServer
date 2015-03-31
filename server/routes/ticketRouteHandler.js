@@ -5,7 +5,6 @@ var Ticket = mongoose.model('Ticket');
 var Command = mongoose.model('Command');
 var async = require('async');
 var router = express.Router();
-var GCM = require('gcm').GCM;
 var http = require('http');//to POST to ennova server
 
 //Parameter used for the delete operation of the tickets. Note that the route that contains 
@@ -47,8 +46,8 @@ exports.ticketParameter = function(req, res, next, id) {
 exports.insertTicket = function(req, res, next) {
 	var ticket = new Ticket();
 	ticket.device_id=req.user[0].device_id;
-	ticket.timestamp= new Date().toTimeString();
-
+	//ticket.timestamp= new Date().toTimeString();
+	ticket.timestamp=new Date().toUTCString();
 	ticket.save(function(err, ticket){
 		if(err){ return next(err); }		
 	});
