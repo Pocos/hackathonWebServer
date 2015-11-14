@@ -5,6 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
+var fs = require( 'fs' );
 
 mongoose.connect('mongodb://localhost/wearable-app');
 require('./models/Gesture');
@@ -25,6 +26,15 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+// less compiler modul
+ app.use(require('less-middleware')({
+        // LESS CSS compiler
+        src : path.join(__dirname, 'public/stylesheets'),
+        yuicompress : true
+    }));
+
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
