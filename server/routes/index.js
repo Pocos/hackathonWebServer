@@ -18,6 +18,7 @@ var JsonWearable = mongoose.model('JsonWearable');
 var async = require('async');
 var router = express.Router();
 var http = require('http');//to POST to ennova server
+var path = require("path");
 
 //var userListRouteHandler = require('./userListRouteHandler');
 

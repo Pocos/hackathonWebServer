@@ -1,21 +1,101 @@
 <html>
-<head>
-  <title>Ennova MagicBox Server</title>
+  <head>
+    <title>Wearable App</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.10/angular-ui-router.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/stylesheets/style.less" rel="stylesheet">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+    <script src="/javascripts/angularApp.js"></script>
+  </head>
+  <body ng-app="wearableApp" ng-controller="MainCtrl">
+    <div class="container-fluid">
+      <!-- navigation bar -->
+      <div class="row" ng-controller="navigationCtrl">
+        <div class="col-xs-4">
+          Arrow navigation
+        </div>
+        <div class="col-xs-8">
+          Navigation bar
+        </div>
+      </div>
 
-  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js"></script>
-  <script src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.10/angular-ui-router.js"></script>
-  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
-  <script src="/javascripts/angularApp.js"></script>
-  <style> .glyphicon-thumbs-up { cursor:pointer } </style>
-</head>
 
-<body ng-app="WearableApp" ng-controller="MainCtrl">
-  <div class="container-fluid">
+      <!-- application menu view -->
+      <div ng-controller="applicationCtrl" class="view applications-menu {{panelVisibility}}">
+        <div class="row"  ng-repeat="app in applications" ng-click="selectApplication($event)">
+          <div class="app-el" data-applicationId="{{app.name}}">
+            <div class="col-xs-2">
+              {{app.icon}}
+            </div>
+            <div class="col-xs-8">
+              <div class="row">
+                <div class="col-xs-12">
+                  <b>{{app.title}}</b>
+                </div>
+                <div class="col-xs-12">
+                  {{app.subtitle}}
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-2">
+              {{app.arrow}}
+            </div>
+          </div>
+        </div>
+      </div>
 
-<p>daje</p>  
-  </div>
+
+      <!-- gesture menu view -->
+      <div ng-controller="gestureCtrl" class="view gestures-menu {{panelVisibility}}">
+        <div class="row" ng-repeat="gesture in gestures" ng-click="selectGesture($event)">
+          <div class="gesture-el" data-gestureId="{{gesture.name}}">
+            <div class="col-xs-2">
+              {{gesture.icon}}
+            </div>
+            <div class="col-xs-8">
+              <div class="row">
+                <div class="col-xs-12">
+                  <b>{{gesture.title}}</b>
+                </div>
+                <div class="col-xs-12">
+                  {{gesture.subtitle}}
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-2">
+              {{gesture.arrow}}
+            </div>
+          </div>
+        </div>
+      </div>
 
 
-</body>
+      <!-- actions menu view -->
+      <div ng-controller="actionCtrl" class="view action-menu {{panelVisibility}}">
+        <div class="row" ng-repeat="act in actions" ng-click="selectAction($event)">
+          <div class="action-el" data-actionId="{{act.name}}">
+            <div class="col-xs-2">
+              {{act.icon}}
+            </div>
+            <div class="col-xs-8">
+              <div class="row">
+                <div class="col-xs-12">
+                  <b>{{act.title}}</b>
+                </div>
+                <div class="col-xs-12">
+                  {{act.subtitle}}
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-2">
+              {{act.arrow}}
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </body>
 </html>
