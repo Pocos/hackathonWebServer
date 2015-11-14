@@ -6,10 +6,9 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost/wearable-app');
-require('./models/Gesture');
+mongoose.connect('mongodb://localhost/wa');
 require('./models/JsonWearable');
-
+require('./models/Gesture');
 var routes = require('./routes/index');
 //var users = require('./routes/users'); will be used for authentication
 

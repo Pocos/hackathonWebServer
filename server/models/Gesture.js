@@ -1,9 +1,12 @@
 var mongoose = require('mongoose');
 
 var GestureSchema = new mongoose.Schema({
-  type: String,
-  name: String
-});
+		name: String,
+  		type: String,
+  		padding: {type: String, default: "                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "},
+  		protocolVersion: {type:Number, default:1}
+},{strict:false, _id:false});
 
 
-mongoose.model('Gesture', GestureSchema);
+
+var GestureModel=mongoose.model('Gesture', GestureSchema);

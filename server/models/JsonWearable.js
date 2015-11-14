@@ -2,8 +2,13 @@ var mongoose = require('mongoose');
 
 var JsonWearableSchema = new mongoose.Schema({
 	appName: {type:String},
-	gestures: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Gesture' }]
-});
+	gestures: {type:Array, "default":[{
+		name: String,
+  		type: String,
+  		padding: {type: String, default: "                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "},
+  		protocolVersion: {type:Number, default:1}
+	},{strict:false, _id:false}]}
+},{strict:false, _id:false});
 
 
 

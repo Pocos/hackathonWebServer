@@ -12,8 +12,9 @@
 **********************************************************/
 var express = require('express');
 var mongoose = require('mongoose');
-var Gestures = mongoose.model('Gesture');
+var Gesture = mongoose.model('Gesture');
 var JsonWearable = mongoose.model('JsonWearable');
+
 var async = require('async');
 var router = express.Router();
 var http = require('http');//to POST to ennova server
@@ -41,13 +42,68 @@ router.get('/app_list', getAppList);
 router.post('/app_list', insertOrUpdateApp);
 
 function getAppList (req, res, next) {
-	res.json("hello");
-  
+	// res.json("hello");
+	JsonWearable.find(function(err, users){
+		if(err){ return next(err); }
+		res.json(users);
+    //console.log(users);
+});
+
 };
 
 //Update the infos about the users, or create a new one. The param device_id is the id that is needed
 //to be inserted/updated
 function insertOrUpdateApp (req, res, next) {
+	// console.log(req.body.action);
+	var myArray = new Array();
 	
+	for(var counter in req.body.gestures){
+		var msg;
+		switch(req.body.gestures[counter].type){
+			case "CHAR_PLZ_MSG":
+
+			var msg = new Gesture(
+			{
+				name:req.body.gestures[counter].name,
+				type:req.body.gestures[counter].type,
+				modifiers:req.body.gestures[counter].modifiers,
+				character:req.body.gestures[counter].character,
+				appName:req.body.gestures[counter].appName,
+				keycodeType:"KEYDOWN_UP"
+			});
+			myArray.push(msg);
+			break;
+			case "MEDIAACTION_PLZ_MSG":
+			var msg = new Gesture(
+			{
+				name:req.body.gestures[counter].name,
+				type:req.body.gestures[counter].type,
+				action:req.body.gestures[counter].action,
+				modifiers:req.body.gestures[counter].modifiers,
+				character:req.body.gestures[counter].character
+			});
+			myArray.push(msg);
+			break;
+		}
+	}
+
+//console.log(msg);
+var json=new JsonWearable(
+{
+	appName:req.body.appName,
+	gestures:myArray
+});
+var condition={appName:req.body.appName};
+
+JsonWearable.findOneAndUpdate(condition,json.toObject(),{upsert: true, new: true},function(err,endResult){
+	if(err){
+		throw err;
+		console.log(err);
+	}else
+	res.json(endResult);
+});
+
 };
+
+
 module.exports = router;
