@@ -2,79 +2,19 @@
 <head>
   <title>Ennova MagicBox Server</title>
 
-  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.11.1.min.js"></script>
   <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js"></script>
   <script src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.10/angular-ui-router.js"></script>
   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
   <script src="/javascripts/angularApp.js"></script>
-  <script src="https://cdn.socket.io/socket.io-1.2.1.js"></script>
   <style> .glyphicon-thumbs-up { cursor:pointer } </style>
 </head>
 
-<body ng-app="EnnovaServer" ng-controller="MainCtrl">
+<body ng-app="WearableApp" ng-controller="MainCtrl">
   <div class="container-fluid">
-    <div class="row clearfix">
-      <div class="col-md-12 column">
-        <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
-          <div class="navbar-header">
-             <a class="navbar-brand" href="#" ng-click="changeTab('home')">Ennova</a>
-          </div>        
-          <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav">
-              <li ng-class="{'active':activeTab =='home'}">
-                <a ui-sref="home" ng-click="changeTab('home')">Home</a>
-              </li>
-              <li ng-class="{'active':activeTab =='user'}">
-                <a ui-sref="user_list" ng-click="changeTab('user')">User List</a>
-              </li>
-              <li ng-class="{'active':activeTab =='ticket'}" >
-                <a ui-sref="ticket_list" ng-click="changeTab('ticket')">Ticket List</a>
-              </li>
-              <li>
-                <a href="#" ng-click="changeTab('home')">Getting started</a>
-              </li> 
-            </ul>
-          </div> <!--end bs-example-navbar-collapse-1 -->          
-        </nav>
-      </div> <!-- end col-md-12 column -->
-    </div>
 
-
-    <div ui-view="body-view">
-
-    </div>    
-
-    <!-- footer -->
-    <div class="col-md-12 column text-center">
-      <nav class="navbar navbar-default navbar-fixed-bottom" role="navigation">
-        <p>
-          Powered by <a href="http://www.tonicminds.com/wp/">TonicMinds</a>
-          <img src="images/logotonic.jpg" width="10%" height="10%"/>
-        </p>
-      </nav>
-
-    </div>
-  </div> <!-- end container -->
-  <!--<div class="page-header text-center">
-    <h1>Welcome to Ennova
-      <img src="images/logo.jpg" width="10%" height="5%"/> Server
-    </h1>
+<p>daje</p>  
   </div>
-  <div class="container-fluid">    
-    <div class="row-fluid">
-      <div class="col-lg-3">       
-       <button ui-sref="user_list" class="btn btn-primary">
-        User List
-      </button><br>
-      <button style="margin-top:100px;" ui-sref="ticket_list" class="btn btn-primary">
-        Ticket List
-      </button>
-    </div>-->
-
-
-  </div>
-</div>
 
 
 </body>

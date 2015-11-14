@@ -12,16 +12,14 @@
 **********************************************************/
 var express = require('express');
 var mongoose = require('mongoose');
-var User = mongoose.model('User');
-var Ticket = mongoose.model('Ticket');
-var Command = mongoose.model('Command');
+var Gestures = mongoose.model('Gesture');
+var JsonWearable = mongoose.model('JsonWearable');
 var async = require('async');
 var router = express.Router();
 var http = require('http');//to POST to ennova server
 
-var userListRouteHandler = require('./userListRouteHandler');
-var ticketRouteHandler = require('./ticketRouteHandler');
-var commandRouteHandler = require('./commandRouteHandler');
+//var userListRouteHandler = require('./userListRouteHandler');
+
 /*******************SECTION: RENDER PAGE VIEWS***********************
 * 
 * The angular pages requires some html/ejs code to fill textboxes, field, table, and so on. To obtain the code they
@@ -35,61 +33,21 @@ router.get('/', function(req, res) {
 	res.render('index', { title: 'Ennova' });
 });
 
-//Initial inner view of the body home page
-router.get('/partial/home', function(req, res, next) {
-	res.render('home', { title: 'Ennova' });
-});
-
-//View for user_list state
-router.get('/partial/user_list', function(req, res, next) {
-	res.render('user_list');
-});
-
-//View for tickets for a specified user
-router.get('/partial/user-ticket_list', function(req, res, next) {
-	res.render('user-ticket_list');
-});
-
-//View for all the tickets
-router.get('/partial/ticket_list',function(req,res,next){
-	res.render('ticket_list');
-})
-
-//View for the gcm console
-router.get('/partial/user_gcm',function(req,res,next){
-	res.render('user_gcm');
-})
-
-/*******************SECTION: PARAMETERS*********************************
-* 																	   *
-************************************************************************/
-router.param('user', userListRouteHandler.userParameter);
-router.param('ticket', ticketRouteHandler.ticketParameter);
 
 /*******************SECTION: USER LIST OPERATIONS***********************
 *                                                                      *
 ************************************************************************/
-router.get('/user_list', userListRouteHandler.getUserList);
-router.post('/user_list/:device_id', userListRouteHandler.insertOrUpdateUser);
-router.delete('/user_list/:user', userListRouteHandler.deleteUser);
+router.get('/app_list', getAppList);
+router.post('/app_list', insertOrUpdateApp);
 
-/*******************SECTION: TICKET LIST OPERATIONS*********************
-*																	   *
-************************************************************************/
-router.post('/ticket_list/:user', ticketRouteHandler.insertTicket);
-router.get('/ticket_list/:user', ticketRouteHandler.getTicketList);
-router.delete('/ticket_list/:user/:ticket', ticketRouteHandler.deleteTicket);
+function getAppList (req, res, next) {
+	res.json("hello");
+  
+};
 
-/*******************SECTION: GCM COMMANDS OPERATIONS********************
-*         															   *
-************************************************************************/
-//Angular -> Server --GCM--> device
-router.post('/send_command', commandRouteHandler.sendGCMCommand);
-//device --> Server
-router.post('/command_list/:user/:action', commandRouteHandler.answerGCM);
-//Angular --> Server
-router.post('/command_list/',commandRouteHandler.getCommandList);
-router.delete('/command_list/:user', commandRouteHandler.deleteCommand);
-
-
+//Update the infos about the users, or create a new one. The param device_id is the id that is needed
+//to be inserted/updated
+function insertOrUpdateApp (req, res, next) {
+	
+};
 module.exports = router;

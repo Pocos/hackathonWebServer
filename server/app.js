@@ -6,10 +6,9 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost/ennova');
-require('./models/User');
-require('./models/Ticket');
-require('./models/Command');
+mongoose.connect('mongodb://localhost/wearable-app');
+require('./models/Gesture');
+require('./models/JsonWearable');
 
 var routes = require('./routes/index');
 //var users = require('./routes/users'); will be used for authentication

@@ -9,6 +9,3 @@ var server = app.listen(app.get('port'), function() {
   debug('Express server listening on port ' + server.address().port);
 });
 
-//START SOCKET.IO PART
-var wscontroller = require('../socket/socket.js');
-wscontroller.init(server);
