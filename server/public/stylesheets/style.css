@@ -109,4 +109,8 @@
   text-transform: capitalize;
   padding: 20px 0;
   border-bottom: 1px solid #ececec;
+  padding-left: 20px;
+}
+.view.action-menu .action-item .action-el .action-element:active {
+  background: #ececec;
 }
