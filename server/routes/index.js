@@ -35,6 +35,26 @@ router.get('/', function(req, res) {
 	res.render('index', { title: 'Ennova' });
 });
 
+// app angular template
+router.get('/applications', function(req, res) {
+	res.render('applications', function(err, html) {
+	  res.send(html);
+	});
+});
+
+// gestures angular template
+router.get('/gestures', function(req, res) {
+	res.render('gestures', function(err, html) {
+	  res.send(html);
+	});
+});
+
+// actions angular template
+router.get('/actions', function(req, res) {
+	res.render('actions', function(err, html) {
+	  res.send(html);
+	});
+});
 
 /*******************SECTION: USER LIST OPERATIONS***********************
 *                                                                      *

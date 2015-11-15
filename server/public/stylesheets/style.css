@@ -1,0 +1,10 @@
+.view {
+  display: none;
+}
+.visible {
+  display: block;
+  color: #ffffff;
+}
+.disabled {
+  pointer-events: none;
+}

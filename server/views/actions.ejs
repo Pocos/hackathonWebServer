@@ -1,0 +1,22 @@
+<div ng-controller="actionCtrl" class="view action-menu {{panelVisibility}}">
+  <div class="row action-item" ng-repeat="act in actions" ng-click="selectAction($event)" style="background: red;">
+    <div class="action-el" data-actionId="{{act.name}}">
+      <div class="col-xs-2">
+        {{act.icon}}
+      </div>
+      <div class="col-xs-8">
+        <div class="row">
+          <div class="col-xs-12">
+            <b>{{act.title}}</b>
+          </div>
+          <div class="col-xs-12">
+            {{act.subtitle}}
+          </div>
+        </div>
+      </div>
+      <div class="col-xs-2">
+        {{act.arrow}}
+      </div>
+    </div>
+  </div>
+</div>

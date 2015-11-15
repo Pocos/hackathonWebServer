@@ -27,11 +27,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 // less compiler modul
- app.use(require('less-middleware')({
-        // LESS CSS compiler
-        src : path.join(__dirname, 'public/stylesheets'),
-        yuicompress : true
-    }));
+// app.use(require('less-middleware')({
+//        // LESS CSS compiler
+//        src : path.join(__dirname, 'public/stylesheets'),
+//        yuicompress : true
+//    }));
 
 
 app.use(express.static(path.join(__dirname, 'public')));
