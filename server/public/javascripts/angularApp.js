@@ -75,7 +75,6 @@ wearableApp.controller('savedGestureCtrl', ['$scope', '$rootScope', function($sc
 		$rootScope.panelVisibility = 'saved-gesture';
 		$scope.appCaller = caller;
 	});
-/*
 	$scope.selectGesture = function ($event) {
 		console.log('select gesture event click');
 
@@ -86,7 +85,6 @@ wearableApp.controller('savedGestureCtrl', ['$scope', '$rootScope', function($sc
 		}
 		$rootScope.$emit('openActionPanel', $scope.appCaller, gestureId);
 	};
-*/
 	$scope.addGesture = function ($event) {
 		$rootScope.$emit('openGesturePanel', $scope.appCaller);
 	};
@@ -140,17 +138,9 @@ wearableApp.controller('actionCtrl', ['$scope', '$rootScope', '$http' ,function(
 	$scope.actions = [
 			{
 				'name': 'play',
-				'icon': 'icon',
-				'title': 'PLAY',
-				'subtitle': 'subtitle',
-				'arrow': 'arrow'
 			},
 			{   
 				'name': 'foward',
-				'icon': 'icon',
-				'title': 'FOWARD ',
-				'subtitle': 'subtitle 1',
-				'arrow': 'arrow'
 			}
 		];
 

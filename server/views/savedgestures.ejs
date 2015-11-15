@@ -1,3 +1,25 @@
 <div ng-controller="savedGestureCtrl" class="view saved-gestures-menu {{panelVisibility}}">
+
+  <div class="row" ng-repeat="gesture in gestures" ng-click="selectGesture($event)"  style="background: green;">
+    <div class="gesture-el" data-gestureId="{{gesture.name}}">
+      <div class="col-xs-2">
+        {{gesture.icon}}
+      </div>
+      <div class="col-xs-8">
+        <div class="row">
+          <div class="col-xs-12">
+            <b>{{gesture.title}}</b>
+          </div>
+          <div class="col-xs-12">
+            {{gesture.subtitle}}
+          </div>
+        </div>
+      </div>
+      <div class="col-xs-2">
+        {{gesture.arrow}}
+      </div>
+    </div>
+  </div>
+  
   <div ng-click="addGesture()">BTN</div>
 </div>
