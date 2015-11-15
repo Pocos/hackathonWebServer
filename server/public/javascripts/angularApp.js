@@ -163,18 +163,14 @@ wearableApp.controller('gestureCtrl', ['messages','$scope', '$rootScope', functi
 
 	$scope.gestures = [
 			{
-				'name': 'tap',
-				'icon': '/images/icn_gesture_1_finger_left.png',
-				'title': 'TAP',
-				'subtitle': 'subtitle',
-				'arrow': 'arrow'
+				'name': 'TAP',
+				'icon': 'icon',
+				'title': 'TAP'
 			},
 			{   
-				'name': 'swype',
-				'icon': '/images/icn_gesture_1_finger_down.png',
-				'title': 'SWYPE ',
-				'subtitle': 'subtitle 1',
-				'arrow': 'arrow'
+				'name': 'SWYPE',
+				'icon': 'icon',
+				'title': 'SWYPE'
 			}
 		];
 
