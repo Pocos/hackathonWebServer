@@ -14,11 +14,18 @@
     <div class="container-fluid">
       <!-- navigation bar -->
       <div class="row header-mobile-nav" ng-controller="navigationCtrl">
-        <div class="col-xs-4 nav-arrow" ng-click="backBtn($event)">
-          <img src="/images/back_icn.png" />
+        <div class="col-xs-2" ng-click="backBtn($event)">
+          <div class="nav-arrow">
+            <img src="/images/back_icn.png" />
+          </div>
         </div>
         <div class="col-xs-8 nav-label">
           App list
+        </div>
+        <div class="col-xs-2">
+          <div class="nav-search">
+            <img src="/images/search_icn.png" />
+          </div>
         </div>
       </div>
 

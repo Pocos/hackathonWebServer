@@ -1,16 +1,75 @@
 // module HEADER
 
-.header-mobile-nav {;
+@media only screen and (-webkit-min-device-pixel-ratio: 2),(min-resolution: 192dpi) {
+
+.header-mobile-nav {
 	background: @menu-base;
 	color: white;
 	font-family: 'Roboto', sans-serif;
 
 	.nav-label {
-		font-size: 20px;
-		padding: @headerPadding 0;
+		font-size: 65px;
+		padding: 40px 0;
+		padding-left: 25px;
 	}
 
 	.nav-arrow {
-		padding: @headerPadding 10px;
+		padding: 55px 30px;
+
+		img {
+			width: 55px;
+		}
+	}
+
+	.nav-search {
+		margin-top: 20px;
+		display: none;
+
+		img {
+			width: 18px;
+		}
 	}
 }
+
+
+// module APPLICATION
+.applications-menu {
+
+	.app-el {
+		height: 120px;
+		margin: 8px 0;
+
+		.app-icon {
+			width: 30px;
+			height: 30px;
+			padding: 50px 30px 30px 30px;
+
+			img {
+				width: 80px;
+			}
+		}
+
+		.app-label {
+			font-size: 50px;
+			padding-top: 52px;
+			padding-right: 0;
+
+			.row {
+				margin: 0;
+				height: 120px;
+				border-bottom: 4px solid @bg-base;
+
+				.col-xs-2 {
+					text-align: center;
+
+					img {
+						width: 20px;
+						margin-top: 30px;
+					}
+				}
+			}
+		}
+	}
+}
+}
+

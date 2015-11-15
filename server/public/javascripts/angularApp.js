@@ -30,15 +30,15 @@ wearableApp.controller('applicationCtrl', ['$scope', '$rootScope', function($sco
 	$scope.applications = [
 		{
 			'name': 'org.videolan.vlc',
-			'icon': 'icon',
-			'title': 'VLC',
+			'icon': '/images/vlc.png',
+			'title': 'Vlc',
 			'subtitle': 'subtitle',
 			'arrow': 'arrow'
 		},
 		{   
 			'name': 'supercazzola',
-			'icon': 'icon',
-			'title': 'TITLE 1 ',
+			'icon': '/images/keynote.png',
+			'title': 'Keynote ',
 			'subtitle': 'subtitle 1',
 			'arrow': 'arrow'
 		}
@@ -159,9 +159,6 @@ wearableApp.controller('actionCtrl', ['$scope', '$rootScope', '$http' ,function(
 		console.log('select action event click');
 
 		var item = angular.element($event.currentTarget);
-		item.parent().find('.action-item').removeClass('disabled');
-		item.addClass('disabled');
-
 		var actionId = angular.element($event.currentTarget).find('.action-el').attr('data-actionId');
 
 		if ($rootScope.applicationsGestures['gestures'].length != 0) {
