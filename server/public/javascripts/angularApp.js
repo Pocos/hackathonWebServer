@@ -3,7 +3,7 @@ var wearableApp =  angular.module('wearableApp', ['ui.router']);
 wearableApp.controller('MainCtrl', ['$scope',function($scope){ }]);
 
 wearableApp.controller('navigationCtrl', ['$scope', '$rootScope', function($scope, $rootScope) {
-	console.log('back button tapped');
+	// console.log('back button tapped');
 
 	$scope.backBtn = function ($event) {
 		//$rootScope.$emit($rootScope.actualState + 'BackEvent');
@@ -21,8 +21,72 @@ wearableApp.controller('navigationCtrl', ['$scope', '$rootScope', function($scop
 
 }]);
 
-wearableApp.controller('applicationCtrl', ['$scope', '$rootScope', function($scope, $rootScope) {
-	console.log('applicationCtrl is running');
+
+
+wearableApp.factory('messages',function(){
+var messages={};
+
+messages.list=[];
+
+messages.actions=[];
+
+messages.appName;
+
+messages.jsons=[];
+
+messages.addAppName = function(message){
+	messages.appName=message;
+}
+
+messages.getAppName=function(){
+	return messages.appName;
+}
+
+messages.addAction=function(message){
+	messages.actions.push(message);
+}
+
+messages.getActions=function(){
+	return messages.actions;
+}
+
+messages.resetActions=function(){
+	messages.actions=[];
+}
+
+messages.addJson=function(appName,messageJson){
+	console.log(messageJson);
+	// var check=messages.messageJson.appName;
+	for (var i=0; i<messages.jsons.length;i++){
+		console.log(messages.jsons[i]);
+		console.log("end");
+		if(messages.jsons[i].appName==appName){
+			console.log("trovato");
+			messages.jsons[i].gestures.push(messageJson.gestures);
+			return;
+		}
+	}
+	console.log("not known");
+	console.log(messageJson);
+	messages.jsons.push(messageJson);
+
+}
+
+messages.getJson=function(appName){
+	return messages.jsons;
+}
+
+//not used
+  messages.add = function(message){
+    messages.list.push({appName: message});
+  };
+
+
+  return messages;
+});
+
+wearableApp.controller('applicationCtrl', ['messages','$scope', '$rootScope', function(messages,$scope, $rootScope) {
+	// console.log('applicationCtrl is running');
 
 	//$rootScope.activeState = 'application'; 
 	$rootScope.panelVisibility = 'application';
@@ -36,7 +100,7 @@ wearableApp.controller('applicationCtrl', ['$scope', '$rootScope', function($sco
 			'arrow': 'arrow'
 		},
 		{   
-			'name': 'supercazzola',
+			'name': 'com.apple.iWork.Keynote',
 			'icon': '/images/keynote.png',
 			'title': 'Keynote ',
 			'subtitle': 'subtitle 1',
@@ -45,7 +109,8 @@ wearableApp.controller('applicationCtrl', ['$scope', '$rootScope', function($sco
 	];
 
 	$scope.selectApplication = function ($event) {
-		console.log('select application event click');
+		messages.resetActions();
+		// console.log('select application event click');
 
 		var appId = angular.element($event.currentTarget).find('.app-el').attr('data-applicationId');
 		if ($rootScope.applicationsGestures && $rootScope.applicationsGestures['appName'] !=  appId) {
@@ -58,10 +123,14 @@ wearableApp.controller('applicationCtrl', ['$scope', '$rootScope', function($sco
 			}
 		}
 
-		$rootScope.$emit('openSavedGesturePanel', appId);
+		messages.addAppName(appId);
+		// console.log(messages.getAppName());
+
+		// $rootScope.$emit('openSavedGesturePanel', appId);
+		$rootScope.panelVisibility = 'gesture';
 	};
 
-	console.log('end applicationCtrl');
+	// console.log('end applicationCtrl');
 }]);
 
 wearableApp.controller('savedGestureCtrl', ['$scope', '$rootScope', function($scope, $rootScope) {
@@ -71,10 +140,7 @@ wearableApp.controller('savedGestureCtrl', ['$scope', '$rootScope', function($sc
 
 		];
 
-	$rootScope.$on('openSavedGesturePanel', function (e, caller) {
-		$rootScope.panelVisibility = 'saved-gesture';
-		$scope.appCaller = caller;
-	});
+	
 	$scope.selectGesture = function ($event) {
 		console.log('select gesture event click');
 
@@ -92,8 +158,8 @@ wearableApp.controller('savedGestureCtrl', ['$scope', '$rootScope', function($sc
 	console.log('end savedGestureCtrl');
 }]);
 
-wearableApp.controller('gestureCtrl', ['$scope', '$rootScope', function($scope, $rootScope) {
-	console.log('gestureCtrl is running');
+wearableApp.controller('gestureCtrl', ['messages','$scope', '$rootScope', function(message,$scope, $rootScope) {
+	// console.log('gestureCtrl is running');
 
 	$scope.gestures = [
 			{
@@ -112,51 +178,47 @@ wearableApp.controller('gestureCtrl', ['$scope', '$rootScope', function($scope, 
 			}
 		];
 
-	$rootScope.$on('openGesturePanel', function (e, caller) {
-		$rootScope.panelVisibility = 'gesture';
-		$scope.appCaller = caller;
-	});
-
 	$scope.selectGesture = function ($event) {
-		console.log('select gesture event click');
+		// console.log('select gesture event click');
 
 		var gestureId = angular.element($event.currentTarget).find('.gesture-el').attr('data-gestureId');
 
 		if (!$rootScope.applicationsGestures['gestures']) {
 			$rootScope.applicationsGestures['gestures'] = [];
 		}
-		$rootScope.$emit('openActionPanel', $scope.appCaller, gestureId);
+
+		console.log(gestureId);
+		$rootScope.$emit('openActionPanel', gestureId);
 	};
 
-	console.log('end gestureCtrl');
+	// console.log('end gestureCtrl');
 }]);
 
-wearableApp.controller('actionCtrl', ['$scope', '$rootScope', '$http' ,function($scope, $rootScope, $http) {
+wearableApp.controller('actionCtrl', ['messages','$scope', '$rootScope', '$http' ,function(messages,$scope, $rootScope, $http) {
 
-	console.log('actionCtrl is running');
+	// console.log('actionCtrl is running');
 
 	$scope.actions = [
 			{
 				'name': 'play',
 			},
 			{   
-				'name': 'foward',
+				'name': 'spacebar',
 			}
 		];
 
 	var commands = {
-		'foward': {"type":"CHAR_PLZ_MSG","modifiers":0,"character":32},
+		'spacebar': {"type":"CHAR_PLZ_MSG","modifiers":0,"character":32},
 		'play': {"type":"MEDIAACTION_PLZ_MSG","action":"play"}
 	};
 
-	$rootScope.$on('openActionPanel', function (e, appCaller, gestureCaller) {
+	$rootScope.$on('openActionPanel', function (e, gestureCaller) {
 		$rootScope.panelVisibility = 'action';
-		$scope.appCaller = appCaller;
 		$scope.gestureCaller = gestureCaller;
 	});
 
 	$scope.selectAction = function ($event) {
-		console.log('select action event click');
+		// console.log('select action event click');
 
 		var item = angular.element($event.currentTarget);
 		var actionId = angular.element($event.currentTarget).find('.action-el').attr('data-actionId');
@@ -170,15 +232,26 @@ wearableApp.controller('actionCtrl', ['$scope', '$rootScope', '$http' ,function(
 		}
 		var cmd = commands[actionId];
 		cmd['name'] = $scope.gestureCaller;
-		cmd['appName'] = $scope.appCaller;
-		$rootScope.applicationsGestures['gestures'].push(cmd);
+		cmd['appName'] = messages.getAppName();
 		
-		console.log(JSON.stringify($rootScope.applicationsGestures)); 
-        $http.post("/app_list", JSON.stringify($rootScope.applicationsGestures)).success(function() {
+		messages.addAction(cmd);
+		// console.log(JSON.stringify(messages.getActions()));
+
+		var jsonToSave={
+			appName: messages.getAppName(),
+			gestures:messages.getActions()
+		}
+
+		// messages.addJson(jsonToSave.appName,jsonToSave);
+
+		// $rootScope.applicationsGestures['gestures'].push(cmd);
+		
+		console.log(JSON.stringify(jsonToSave));
+        $http.post("/app_list", JSON.stringify(jsonToSave)).success(function() {
             console.log('post done');
         });
 	};
 
-	console.log('end actionCtrl');
+	// console.log('end actionCtrl');
 	
 }]);
