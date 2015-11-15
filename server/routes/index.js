@@ -42,6 +42,13 @@ router.get('/applications', function(req, res) {
 	});
 });
 
+// saved gestures angular template
+router.get('/savedgestures', function(req, res) {
+	res.render('savedgestures', function(err, html) {
+	  res.send(html);
+	});
+});
+
 // gestures angular template
 router.get('/gestures', function(req, res) {
 	res.render('gestures', function(err, html) {
@@ -55,6 +62,8 @@ router.get('/actions', function(req, res) {
 	  res.send(html);
 	});
 });
+
+
 
 /*******************SECTION: USER LIST OPERATIONS***********************
 *                                                                      *

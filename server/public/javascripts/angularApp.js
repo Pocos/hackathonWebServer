@@ -6,7 +6,17 @@ wearableApp.controller('navigationCtrl', ['$scope', '$rootScope', function($scop
 	console.log('back button tapped');
 
 	$scope.backBtn = function ($event) {
-		$rootScope.$emit($rootScope.actualState + 'BackEvent');
+		//$rootScope.$emit($rootScope.actualState + 'BackEvent');
+
+		if ($rootScope.panelVisibility == 'saved-gesture') {
+			$rootScope.panelVisibility = 'application';
+		} 
+		if ($rootScope.panelVisibility == 'gesture') {
+			$rootScope.panelVisibility = 'saved-gesture';
+		}
+		if ($rootScope.panelVisibility == 'action') {
+			$rootScope.panelVisibility = 'gesture';
+		}
 	};
 
 }]);
@@ -14,8 +24,8 @@ wearableApp.controller('navigationCtrl', ['$scope', '$rootScope', function($scop
 wearableApp.controller('applicationCtrl', ['$scope', '$rootScope', function($scope, $rootScope) {
 	console.log('applicationCtrl is running');
 
-	$rootScope.activeState = 'application'; 
-	$scope.panelVisibility = 'visible';
+	//$rootScope.activeState = 'application'; 
+	$rootScope.panelVisibility = 'application';
 
 	$scope.applications = [
 		{
@@ -48,23 +58,44 @@ wearableApp.controller('applicationCtrl', ['$scope', '$rootScope', function($sco
 			}
 		}
 
-		$scope.panelVisibility = '';
-
-		$rootScope.$emit('openGestureSettedPanel', appId);
+		$rootScope.$emit('openSavedGesturePanel', appId);
 	};
-
-	$rootScope.$on('backToApplicationPanel', function (e) { 
-		$scope.panelVisibility = "visible";
-		$rootScope.actualState = 'application';
-	});
 
 	console.log('end applicationCtrl');
 }]);
 
+wearableApp.controller('savedGestureCtrl', ['$scope', '$rootScope', function($scope, $rootScope) {
+	console.log('savedGestureCtrl is running');
+
+	$scope.gestures = [
+
+		];
+
+	$rootScope.$on('openSavedGesturePanel', function (e, caller) {
+		$rootScope.panelVisibility = 'saved-gesture';
+		$scope.appCaller = caller;
+	});
+/*
+	$scope.selectGesture = function ($event) {
+		console.log('select gesture event click');
+
+		var gestureId = angular.element($event.currentTarget).find('.gesture-el').attr('data-gestureId');
+
+		if (!$rootScope.applicationsGestures['gestures']) {
+			$rootScope.applicationsGestures['gestures'] = [];
+		}
+		$rootScope.$emit('openActionPanel', $scope.appCaller, gestureId);
+	};
+*/
+	$scope.addGesture = function ($event) {
+		$rootScope.$emit('openGesturePanel', $scope.appCaller);
+	};
+
+	console.log('end savedGestureCtrl');
+}]);
+
 wearableApp.controller('gestureCtrl', ['$scope', '$rootScope', function($scope, $rootScope) {
 	console.log('gestureCtrl is running');
-
-	$rootScope.actualState = 'gesture';
 
 	$scope.gestures = [
 			{
@@ -84,7 +115,7 @@ wearableApp.controller('gestureCtrl', ['$scope', '$rootScope', function($scope, 
 		];
 
 	$rootScope.$on('openGesturePanel', function (e, caller) {
-		$scope.panelVisibility = 'visible';
+		$rootScope.panelVisibility = 'gesture';
 		$scope.appCaller = caller;
 	});
 
@@ -96,19 +127,8 @@ wearableApp.controller('gestureCtrl', ['$scope', '$rootScope', function($scope, 
 		if (!$rootScope.applicationsGestures['gestures']) {
 			$rootScope.applicationsGestures['gestures'] = [];
 		}
-		$scope.panelVisibility = '';
 		$rootScope.$emit('openActionPanel', $scope.appCaller, gestureId);
 	};
-
-	$rootScope.$on('backToGesturePanel', function (e) { 
-		$scope.panelVisibility = "visible";
-		$rootScope.actualState = 'gesture';
-	});
-
-	$rootScope.$on('gestureBackEvent', function () {
-		$rootScope.$emit('backToApplicationPanel');
-        $scope.panelVisibility = '';
-	});
 
 	console.log('end gestureCtrl');
 }]);
@@ -116,8 +136,6 @@ wearableApp.controller('gestureCtrl', ['$scope', '$rootScope', function($scope, 
 wearableApp.controller('actionCtrl', ['$scope', '$rootScope', '$http' ,function($scope, $rootScope, $http) {
 
 	console.log('actionCtrl is running');
-
-	$rootScope.actualState = 'action';
 
 	$scope.actions = [
 			{
@@ -142,10 +160,9 @@ wearableApp.controller('actionCtrl', ['$scope', '$rootScope', '$http' ,function(
 	};
 
 	$rootScope.$on('openActionPanel', function (e, appCaller, gestureCaller) {
-		$scope.panelVisibility = 'visible';
+		$rootScope.panelVisibility = 'action';
 		$scope.appCaller = appCaller;
 		$scope.gestureCaller = gestureCaller;
-		$rootScope.actualState = 'action';
 	});
 
 	$scope.selectAction = function ($event) {
@@ -174,11 +191,6 @@ wearableApp.controller('actionCtrl', ['$scope', '$rootScope', '$http' ,function(
             console.log('post done');
         });
 	};
-
-	$rootScope.$on('actionBackEvent', function () {
-		$rootScope.$emit('backToGesturePanel');
-        $scope.panelVisibility = '';
-	});
 
 	console.log('end actionCtrl');
 	

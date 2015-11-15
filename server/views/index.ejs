@@ -6,25 +6,28 @@
     <script src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.10/angular-ui-router.js"></script>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet">
     <link href="/stylesheets/style.css" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,300,500' rel='stylesheet' type='text/css'>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
     <script src="/javascripts/angularApp.js"></script>
   </head>
   <body ng-app="wearableApp" ng-controller="MainCtrl">
     <div class="container-fluid">
       <!-- navigation bar -->
-      <div class="row" ng-controller="navigationCtrl">
-        <div class="col-xs-4" ng-click="backBtn($event)">
-          Arrow navigation
+      <div class="row header-mobile-nav" ng-controller="navigationCtrl">
+        <div class="col-xs-4 nav-arrow" ng-click="backBtn($event)">
+          <img src="/images/back_icn.png" />
         </div>
-        <div class="col-xs-8">
-          Navigation bar
+        <div class="col-xs-8 nav-label">
+          App list
         </div>
       </div>
 
       <!-- application menu view -->
       <div ng-include="'/applications'"></div>
 
-
+      <!-- saved gesture menu view -->
+      <div ng-include="'/savedgestures'"></div>
+      
       <!-- gesture menu view -->
       <div ng-include="'/gestures'"></div>
 

@@ -1,10 +1,33 @@
 .view {
   display: none;
 }
+.view.applications-menu.application {
+  display: block;
+}
+.view.gestures-menu.gesture {
+  display: block;
+}
+.view.action-menu.action {
+  display: block;
+}
+.view.saved-gestures-menu.saved-gesture {
+  display: block;
+}
 .visible {
   display: block;
-  color: #ffffff;
 }
 .disabled {
   pointer-events: none;
+}
+.header-mobile-nav {
+  background: #9b59b6;
+  color: white;
+  font-family: 'Roboto', sans-serif;
+}
+.header-mobile-nav .nav-label {
+  font-size: 20px;
+  padding: 16px 0;
+}
+.header-mobile-nav .nav-arrow {
+  padding: 16px 10px;
 }
