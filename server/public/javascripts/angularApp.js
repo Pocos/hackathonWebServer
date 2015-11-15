@@ -18,7 +18,7 @@ wearableApp.controller('navigationCtrl', ['$scope', '$rootScope', function($scop
 			$rootScope.panelVisibility = 'gesture';
 		}
 	};
-
+// cmt
 }]);
 
 
