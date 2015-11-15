@@ -1,6 +1,5 @@
 // module HEADER
 
-@media only screen and (-webkit-min-device-pixel-ratio: 2),(min-resolution: 192dpi) {
 
 .header-mobile-nav {
 	background: @menu-base;
@@ -8,16 +7,16 @@
 	font-family: 'Roboto', sans-serif;
 
 	.nav-label {
-		font-size: 65px;
-		padding: 40px 0;
-		padding-left: 25px;
+		font-size: 22px;
+		padding: 10px 0;
+	    padding-left: 15px;
 	}
 
 	.nav-arrow {
-		padding: 55px 30px;
+		padding: 18px 10px;
 
 		img {
-			width: 55px;
+			width: 15px;
 		}
 	}
 
@@ -36,40 +35,80 @@
 .applications-menu {
 
 	.app-el {
-		height: 120px;
+		height: 60px;
 		margin: 8px 0;
 
 		.app-icon {
-			width: 30px;
-			height: 30px;
-			padding: 50px 30px 30px 30px;
+			padding: 15px 0px 0px 8px;
 
 			img {
-				width: 80px;
+				width: 41px;
 			}
 		}
 
 		.app-label {
-			font-size: 50px;
-			padding-top: 52px;
+			font-size: 21px;
+			padding-top: 20px;
 			padding-right: 0;
+			padding-left: 0;
 
 			.row {
 				margin: 0;
-				height: 120px;
-				border-bottom: 4px solid @bg-base;
+				height: 60px;
+				border-bottom: 1px solid @bg-base;
+
+				.col-xs-10 {
+					padding-right: 0;
+				}
 
 				.col-xs-2 {
 					text-align: center;
 
 					img {
-						width: 20px;
-						margin-top: 30px;
+						width: 8px;
+						margin-top: 12px;
 					}
 				}
 			}
 		}
 	}
 }
-}
+
+// module GESTURES
+.view.gestures-menu {
+
+	.col-xs-6 {
+		padding: 0 8px;
+
+		&:nth-child(even) {
+			padding-left: 4px;
+		}
+		&:nth-child(odd) {
+			padding-right: 4px;
+		}
+	}
+
+	.gesture-el {
+		margin:  8px 0;
+		margin-bottom: 0px;
+		webkit-box-shadow: 0px 0px 8px 0px rgba(50, 50, 50, 0.75);
+	    -moz-box-shadow: 0px 0px 8px 0px rgba(50, 50, 50, 0.75);
+		box-shadow: 0px 0px 8px 0px rgba(50, 50, 50, 0.75);
+
+		.icon {
+			background-color: @gesture-bg-base; 
+			text-align: center;
+			padding: 30px 0;
+
+			img {
+				width: 60px;
+			}
+		}
+
+		.title {
+		    font-size: 15px;
+    		padding: 7px 15px;
+		}
+	}
+} 
 

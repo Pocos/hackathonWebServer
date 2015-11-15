@@ -1,9 +1,9 @@
 <div ng-controller="gestureCtrl" class="view gestures-menu {{panelVisibility}}">
-  <div class="row" ng-repeat="gesture in gestures" ng-click="selectGesture($event)"  style="background: green;">
-    <div class="gesture-el" data-gestureId="{{gesture.name}}">
-      <div class="col-xs-6">
+  <div class="row"> 
+    <div class="col-xs-6" ng-repeat="gesture in gestures" ng-click="selectGesture($event)">
+      <div class="gesture-el" data-gestureId="{{gesture.name}}">
         <div class="icon">
-          {{gesture.icon}}
+          <img src="{{gesture.icon}}" />
         </div>
         <div class="title">
           {{gesture.title}}

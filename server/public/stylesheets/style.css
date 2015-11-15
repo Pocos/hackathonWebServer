@@ -19,57 +19,85 @@
 .disabled {
   pointer-events: none;
 }
-@media only screen and (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-  .header-mobile-nav {
-    background: #9b59b6;
-    color: white;
-    font-family: 'Roboto', sans-serif;
-  }
-  .header-mobile-nav .nav-label {
-    font-size: 65px;
-    padding: 40px 0;
-    padding-left: 25px;
-  }
-  .header-mobile-nav .nav-arrow {
-    padding: 55px 30px;
-  }
-  .header-mobile-nav .nav-arrow img {
-    width: 55px;
-  }
-  .header-mobile-nav .nav-search {
-    margin-top: 20px;
-    display: none;
-  }
-  .header-mobile-nav .nav-search img {
-    width: 18px;
-  }
-  .applications-menu .app-el {
-    height: 120px;
-    margin: 8px 0;
-  }
-  .applications-menu .app-el .app-icon {
-    width: 30px;
-    height: 30px;
-    padding: 50px 30px 30px 30px;
-  }
-  .applications-menu .app-el .app-icon img {
-    width: 80px;
-  }
-  .applications-menu .app-el .app-label {
-    font-size: 50px;
-    padding-top: 52px;
-    padding-right: 0;
-  }
-  .applications-menu .app-el .app-label .row {
-    margin: 0;
-    height: 120px;
-    border-bottom: 4px solid #ececec;
-  }
-  .applications-menu .app-el .app-label .row .col-xs-2 {
-    text-align: center;
-  }
-  .applications-menu .app-el .app-label .row .col-xs-2 img {
-    width: 20px;
-    margin-top: 30px;
-  }
+.header-mobile-nav {
+  background: #9b59b6;
+  color: white;
+  font-family: 'Roboto', sans-serif;
+}
+.header-mobile-nav .nav-label {
+  font-size: 22px;
+  padding: 10px 0;
+  padding-left: 15px;
+}
+.header-mobile-nav .nav-arrow {
+  padding: 18px 10px;
+}
+.header-mobile-nav .nav-arrow img {
+  width: 15px;
+}
+.header-mobile-nav .nav-search {
+  margin-top: 20px;
+  display: none;
+}
+.header-mobile-nav .nav-search img {
+  width: 18px;
+}
+.applications-menu .app-el {
+  height: 60px;
+  margin: 8px 0;
+}
+.applications-menu .app-el .app-icon {
+  padding: 15px 0px 0px 8px;
+}
+.applications-menu .app-el .app-icon img {
+  width: 41px;
+}
+.applications-menu .app-el .app-label {
+  font-size: 21px;
+  padding-top: 20px;
+  padding-right: 0;
+  padding-left: 0;
+}
+.applications-menu .app-el .app-label .row {
+  margin: 0;
+  height: 60px;
+  border-bottom: 1px solid #ececec;
+}
+.applications-menu .app-el .app-label .row .col-xs-10 {
+  padding-right: 0;
+}
+.applications-menu .app-el .app-label .row .col-xs-2 {
+  text-align: center;
+}
+.applications-menu .app-el .app-label .row .col-xs-2 img {
+  width: 8px;
+  margin-top: 12px;
+}
+.view.gestures-menu .col-xs-6 {
+  padding: 0 8px;
+}
+.view.gestures-menu .col-xs-6:nth-child(even) {
+  padding-left: 4px;
+}
+.view.gestures-menu .col-xs-6:nth-child(odd) {
+  padding-right: 4px;
+}
+.view.gestures-menu .gesture-el {
+  margin: 8px 0;
+  margin-bottom: 0px;
+  webkit-box-shadow: 0px 0px 8px 0px rgba(50, 50, 50, 0.75);
+  -moz-box-shadow: 0px 0px 8px 0px rgba(50, 50, 50, 0.75);
+  box-shadow: 0px 0px 8px 0px rgba(50, 50, 50, 0.75);
+}
+.view.gestures-menu .gesture-el .icon {
+  background-color: #1abc9c;
+  text-align: center;
+  padding: 30px 0;
+}
+.view.gestures-menu .gesture-el .icon img {
+  width: 60px;
+}
+.view.gestures-menu .gesture-el .title {
+  font-size: 15px;
+  padding: 7px 15px;
 }
