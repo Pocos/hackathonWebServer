@@ -12,7 +12,7 @@ wearableApp.controller('navigationCtrl', ['$scope', '$rootScope', function($scop
 			$rootScope.panelVisibility = 'application';
 		} 
 		if ($rootScope.panelVisibility == 'gesture') {
-			$rootScope.panelVisibility = 'saved-gesture';
+			$rootScope.panelVisibility = 'application';
 		}
 		if ($rootScope.panelVisibility == 'action') {
 			$rootScope.panelVisibility = 'gesture';
@@ -163,18 +163,14 @@ wearableApp.controller('gestureCtrl', ['messages','$scope', '$rootScope', functi
 
 	$scope.gestures = [
 			{
-				'name': 'tap',
+				'name': 'TAP',
 				'icon': 'icon',
-				'title': 'TAP',
-				'subtitle': 'subtitle',
-				'arrow': 'arrow'
+				'title': 'TAP'
 			},
 			{   
-				'name': 'swype',
+				'name': 'SWYPE',
 				'icon': 'icon',
-				'title': 'SWYPE ',
-				'subtitle': 'subtitle 1',
-				'arrow': 'arrow'
+				'title': 'SWYPE'
 			}
 		];
 
