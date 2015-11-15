@@ -36,8 +36,11 @@
   width: 15px;
 }
 .header-mobile-nav .nav-search {
-  margin-top: 20px;
-  display: none;
+  margin-top: 14px;
+  /* display: none; */
+
+  text-align: right;
+  padding-right: 11px;
 }
 .header-mobile-nav .nav-search img {
   width: 18px;
@@ -100,4 +103,10 @@
 .view.gestures-menu .gesture-el .title {
   font-size: 15px;
   padding: 7px 15px;
+}
+.view.action-menu .action-item .action-el .action-element {
+  font-size: 18px;
+  text-transform: capitalize;
+  padding: 20px 0;
+  border-bottom: 1px solid #ececec;
 }

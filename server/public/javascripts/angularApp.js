@@ -12,7 +12,7 @@ wearableApp.controller('navigationCtrl', ['$scope', '$rootScope', function($scop
 			$rootScope.panelVisibility = 'application';
 		} 
 		if ($rootScope.panelVisibility == 'gesture') {
-			$rootScope.panelVisibility = 'saved-gesture';
+			$rootScope.panelVisibility = 'application';
 		}
 		if ($rootScope.panelVisibility == 'action') {
 			$rootScope.panelVisibility = 'gesture';
